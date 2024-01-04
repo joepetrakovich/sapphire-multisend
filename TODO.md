@@ -16,6 +16,7 @@ DONE - implement the send with gas estimation.
 -- on send, estimate gas, send, refresh balance. check
 - clean up styles
 - move on!
+- add a small settable fee
 
 - eventually could do the massdrop thing with claiming since that would allow
 recall in case of accident or unclaimed. but for now just get this working enough for rosy airdrop

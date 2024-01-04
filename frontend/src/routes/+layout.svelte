@@ -4,7 +4,7 @@ import "../app.css"
 </script>
 <nav>
    <div>Oasis Multisend</div>
-   <WalletConnection />
+   <WalletConnection showAddress={true} />
 </nav>
 
 <main>
@@ -21,13 +21,10 @@ import "../app.css"
         display: flex;
         justify-content: space-between;
     }
-    main {
-        max-width: 500px;
-        margin: 0 auto;
-    }
     footer {
         display: flex;
         align-items: center;
+        gap: 8px;
         justify-content: end;
     }
 </style>

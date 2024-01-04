@@ -31,6 +31,7 @@
 		"@oasisprotocol/sapphire-paratime": "^1.2.2",
 		"ethers": "^6.9.0",
 		"ethers-svelte": "^3.2.1",
-		"papaparse": "^5.4.1"
+		"papaparse": "^5.4.1",
+		"svelte-fsm": "^1.2.0"
 	}
 }

@@ -3,8 +3,7 @@ export interface Token {
     name: string,
     symbol: string,
     decimals: number,
-    address?: string,
-    isChainNativeCurrency: boolean
+    address: string
 }
 
 export interface Currency {

@@ -4,7 +4,7 @@
     import { oasisNetworkStatus } from '$lib/Stores';
 	import { OASIS_SAPPHIRE_TESTNET, connectWallet, switchNetworkOrAddIfNotExists } from '$lib/Network';
 
-    export let showAddress:boolean = false;
+    export let showAddress: boolean = false;
 
     const handleConnectToSapphire = () => {
        switchNetworkOrAddIfNotExists(OASIS_SAPPHIRE_TESTNET);

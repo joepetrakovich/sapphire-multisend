@@ -1,34 +1,64 @@
 <script lang="ts">
+    import TokenSelector from '$lib/TokenSelector.svelte';
     import { ethers } from 'ethers';
     import Papa from 'papaparse';
-    import type { Token } from '$lib/Models';
-    import TokenSelector from '$lib/TokenSelector.svelte';
-    import { signerAddress } from '$lib/Stores';
+    import { OasisNetworkStatus, type Token } from '$lib/Models';
+    import { oasisNetworkStatus, signerAddress } from '$lib/Stores';
     import GenericERC20 from "$lib/contracts/GenericERC20.json";
     import MultiSendArtifact from "$lib/contracts/MultiSend.json";
     import ca from "$lib/contracts/contract-addresses.json";
     import * as sapphire from '@oasisprotocol/sapphire-paratime';
+	import WalletConnection from '$lib/WalletConnection.svelte';
+    import fsm from 'svelte-fsm'
+    import OasisLogo from '$lib/images/oasis-logo-120px.png';
+    
+    const dapp = fsm('disconnected', {
+        disconnected: {
+            connect: 'connected'
+        },
+        connected: {
+            disconnect: 'disconnected'
+        }
+    });
+
+    const form = fsm('entering', {
+        entering: {},
+        valid: {},
+        invalid: {}
+    });
+
+    enum SendType { ERC20Token, Rose }
+    let group: SendType = SendType.ERC20Token;
 
     let token: Token;
-    let balance: string;
+    let balance: bigint;
+    let allowance: bigint;
+
+    $: $oasisNetworkStatus !== OasisNetworkStatus.ON_SAPPHIRE_PARATIME ? dapp.disconnect() : dapp.connect();
+
+    $: balanceDisplay = token && balance ? ethers.formatUnits(balance, token.decimals) : '';
+    $: allowanceDisplay = token && allowance ? ethers.formatUnits(allowance, token.decimals) : '';
+
     let text: string;
     let addressesAndAmounts: { address: string, amount: bigint }[] = [];
     let lineNum = 0;
-    let remainingAllowance: string;
+
     let totalToSend: number;
 
-    const getTokenBalance = async () => {
+    $: needsApproval = !token?.isChainNativeCurrency && allowance < totalToSend
+
+    const getTokenBalanceAndAllowance = async () => {
         if (token.isChainNativeCurrency) {
             const provider = new ethers.BrowserProvider(window.ethereum);
-            const roseBalance = await provider.getBalance($signerAddress);
-            balance = ethers.formatEther(roseBalance);
+            balance = await provider.getBalance($signerAddress);
         } else {
             const contract = new ethers.Contract(
                  token.address!,
                  GenericERC20.abi,
             new ethers.BrowserProvider(window.ethereum));
-   
-            balance = ethers.formatUnits(await contract.balanceOf($signerAddress), token.decimals);
+
+            balance = await contract.balanceOf($signerAddress);
+            allowance = await contract.allowance($signerAddress, ca.MultiSend);
         }
     }
 
@@ -93,7 +123,8 @@
                  GenericERC20.abi,
             new ethers.BrowserProvider(window.ethereum));
 
-            remainingAllowance = ethers.formatUnits(await contract.allowance($signerAddress, ca.MultiSend), token.decimals);
+            let allowance:bigint = await contract.allowance($signerAddress, ca.MultiSend);
+            allowanceDisplay = ethers.formatUnits(allowance, token.decimals);
         }
     }
 
@@ -123,7 +154,6 @@
             // .catch(console.log)
             // .finally(() => submitting = false)
     }
-
     
     const send = async () => {
         //this instance can be cached. does it need to be sapphire wrapped?
@@ -160,23 +190,82 @@
 
 </script>
 
+<div>
+    <form>
+        <div>
+            What are you sending?
+            <label><input type="radio" value={SendType.ERC20Token} bind:group disabled={$dapp !== 'connected'} />Token</label>
+            <label><input type="radio" value={SendType.Rose} bind:group disabled={$dapp !== 'connected'} /><img src={OasisLogo} alt="Oasis Logo" width="16" />Rose</label>
+        </div>
+        
+        {#if group === SendType.ERC20Token}
+            <TokenSelector disabled={$dapp !== 'connected'} /> 
+        {/if}
+
+       <textarea rows="10" disabled={$dapp !== 'connected'} placeholder="Enter comma-delimeted addresses and amounts..." />
+
+        {#if $dapp === 'connected'}
+            <button disabled={$form !== 'valid'}>Send</button>
+        {:else}
+            <WalletConnection />
+        {/if}
+    </form>
+
+    <span>dapp state: {$dapp}</span>
+    <span>form state: {$form}</span>
+</div>
+
+<style>
+    div, form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2em;
+    }
+    form :global(button) {
+        width: 100%;
+    }
+    form > div, label {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.2em;
+    }
+    label {
+        line-height: 0;
+    }
+</style>
+
+<!-- 
 Name: {token?.name || ''}
 Symbol: {token?.symbol || ''}
 Decimals: {token?.decimals || ''}
-Balance: {balance || ''}
+Balance: {balanceDisplay}
 
 <div>
-    <TokenSelector bind:token on:tokenselected={getTokenBalance} /> 
+    <TokenSelector bind:token on:tokenselected={getTokenBalanceAndAllowance} /> 
     <textarea bind:value={text} on:change={parse} rows="10" placeholder="Enter a comma-separated list of address, value pairs..."></textarea>
-    <button on:click={approve}>Approve</button>
-    <button on:click={send}>Send</button>
+   
+    {#if $oasisNetworkStatus !== OasisNetworkStatus.ON_SAPPHIRE_PARATIME}
+        <WalletConnection />
+    {:else}
+        {#if needsApproval}
+            <button on:click={approve}>Approve</button>
+        {:else}
+            <button on:click={send}>Send</button>       
+        {/if}
+    {/if}
+
     <ul>
         {#each addressesAndAmounts as pair}
             <li>{pair.address}, {pair.amount.toString()}</li>
         {/each}
     </ul>
-        Total {token?.symbol || ''} to send: {totalToSend || ''}
-        Spend Allowance: {remainingAllowance || ''}
+
+    Total {token?.symbol || ''} to send: {totalToSend || ''}
+
+    {#if token && !token.isChainNativeCurrency}
+        Spend Allowance: {allowanceDisplay}
+    {/if}
 </div>
 
 <style>
@@ -185,4 +274,7 @@ Balance: {balance || ''}
         flex-direction: column;
         background-color: white;
     }
-</style>
+    div :global(button) {
+        width: 100%;
+    }
+</style> -->
