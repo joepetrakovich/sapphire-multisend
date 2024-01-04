@@ -45,3 +45,7 @@ export default function formatEther(wei: bigint, precision: number = 2) {
 
   return num;
 }
+
+export function isNumber(value: any) {
+  return typeof value === 'number' && isFinite(value);
+}

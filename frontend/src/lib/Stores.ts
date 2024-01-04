@@ -13,7 +13,7 @@ export const oasisNetworkStatus = readable<OasisNetworkStatus>(OasisNetworkStatu
     }, 1000);
 
     return function stop() {
-        clearInterval(interval); 
+        clearInterval(interval);
     }
 });
 
@@ -27,9 +27,36 @@ export const signerAddress = readable<string>('', set => {
     }, 1000);
 
     return function stop() {
-        clearInterval(interval); 
+        clearInterval(interval);
     }
 });
+
+// export const genericERC20Contract: Readable<ethers.Contract | undefined> = derived([oasisNetworkStatus, signerAddress], ([$networkStatus], set) => {
+//     if ($networkStatus == OasisNetworkStatus.ON_SAPPHIRE_PARATIME) {
+//         set(new ethers.Contract(
+//                 contractAddress.RoseDerby,
+//                 RoseDerbyArtifact.abi,
+//                 new ethers.BrowserProvider(window.ethereum))
+//         );
+//     } else {
+//         set(undefined);
+//     }
+// });
+
+
+// export const tokenContract: (address: string) => Readable<ethers.Contract> = (address: string) => {
+//     const contract = readable(false, (set) => {
+//         const m: MediaQueryList = window.matchMedia(mediaQueryString);
+//         set(m.matches);
+
+//         const listener: (this: MediaQueryList, ev: MediaQueryListEvent) => any = e => set(e.matches);
+//         m.addEventListener("change", listener);
+
+//         return () => m.removeEventListener("change", listener);
+//     });
+
+//     return matches;
+// }
 
 // export const roseDerbyContract: Readable<ethers.Contract|undefined> = derived([oasisNetworkStatus, signerAddress], ([$networkStatus], set) => {
 //     if ($networkStatus == OasisNetworkStatus.ON_SAPPHIRE_PARATIME) {     

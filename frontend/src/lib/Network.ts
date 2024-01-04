@@ -16,7 +16,20 @@ export const OASIS_SAPPHIRE_TESTNET: Network = {
         decimals: 18
     }
   }
-  
+
+  export const HARDHAT_NETWORK: Network = {
+    name: "Hardhat",
+    chainIdHex:  "0x539",
+    chainIdDecimal: 31337,
+    rpcUrls: ["http://127.0.0.1:8545/"],
+    blockExplorerUrls: ["https://localhost"],
+    nativeCurrency: {
+        name: "ETH", 
+        symbol: "ETH",
+        decimals: 18
+    }
+  }
+
   function addNetwork(network: Network) {
     return window.ethereum.request({
         method: "wallet_addEthereumChain",

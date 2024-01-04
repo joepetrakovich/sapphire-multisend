@@ -1,19 +1,24 @@
 
 ## TODAY
 ----------------
-DONE - connect wallet
-- implement approve spend
-DONE -- push a test erc20 with tokens
--- push a contract that can do the multisend
--- send tokens to holder
--- 
+DONE - finish up basic parser validation
+DONE - on parse success, use outputs to check approvals. if amount already approved, allow send button to be clicked.
+DONE -if not enough approved, have approve button clickable.
+
+DONE - implement the send with gas estimation.
 
 
 ## NEXT
 ----------------
-- implement the send with gas estimation.
+-- send does approve (gas estimate first?)
+-- query approval, if enough approved for total amount, allow button to change to send button
+- make sure not to allow injection attack
+-- on send, estimate gas, send, refresh balance. check
 - clean up styles
 - move on!
+
+- eventually could do the massdrop thing with claiming since that would allow
+recall in case of accident or unclaimed. but for now just get this working enough for rosy airdrop
 
 ## NOTES
 ---------------

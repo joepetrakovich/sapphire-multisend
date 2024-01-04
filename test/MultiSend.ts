@@ -16,22 +16,22 @@ describe("MultiSend", function () {
     const MyToken = await ethers.getContractFactory("MyToken");
     const multiSend = await MultiSend.deploy(deployerAccount.address);
     const myToken = await MyToken.deploy();
-
+    
     return { multiSend, myToken, deployerAccount, secondAccount, thirdAccount };
   }
 
-  describe("Deployment", function() {
-    it("Should set the owner", async function() {
+  describe("Deployment", function () {
+    it("Should set the owner", async function () {
       const { multiSend, deployerAccount } = await loadFixture(deployMultiSendFixture);
 
       expect(await multiSend.owner()).to.be.equal(deployerAccount.address);
     });
   });
-
+  
   describe("Sending tokens", function () {
     it("Should fail if token transfer approval amount for sender isn't enough", async function () {
       const { multiSend, myToken, secondAccount } = await loadFixture(deployMultiSendFixture);
-      
+
       const addresses = [secondAccount.address];
       const amounts = [1];
 
@@ -40,7 +40,7 @@ describe("MultiSend", function () {
 
     it("Should fail if sender doesn't have enough of the token to send", async function () {
       const { multiSend, myToken, deployerAccount, secondAccount } = await loadFixture(deployMultiSendFixture);
-      
+
       const totalToSend = ethers.parseUnits('20000000000', 18); //2b
       const addresses = [secondAccount.address];
       const amounts = [totalToSend];
@@ -51,7 +51,7 @@ describe("MultiSend", function () {
 
     it("Should transfer tokens from sender to recipients if enough approved", async function () {
       const { multiSend, myToken, deployerAccount, secondAccount } = await loadFixture(deployMultiSendFixture);
-      
+
       const totalToSend = 1;
       const addresses = [secondAccount.address];
       const amounts = [totalToSend];
@@ -61,7 +61,7 @@ describe("MultiSend", function () {
       expect(await myToken.balanceOf(secondAccount.address)).to.equal(0);
 
       await myToken.approve(multiSend.target, totalToSend);
-     
+
       expect(await myToken.allowance(deployerAccount, multiSend.target)).to.equal(totalToSend);
 
       await multiSend.multiSendToken(myToken.target, addresses, amounts);
@@ -70,10 +70,10 @@ describe("MultiSend", function () {
       expect(await myToken.balanceOf(deployerAccount.address)).to.equal(originalSenderBalance - BigInt(totalToSend));
     });
 
-    
+
     it("Should transfer tokens from sender to multiple recipients", async function () {
       const { multiSend, myToken, deployerAccount, secondAccount, thirdAccount } = await loadFixture(deployMultiSendFixture);
-      
+
       const totalToSend = 20;
       const addresses = [secondAccount.address, thirdAccount.address];
       const amounts = [15, 5];
@@ -95,20 +95,20 @@ describe("MultiSend", function () {
   describe("Sending Rose", function () {
     it("Should fail if message value isn't enough", async function () {
       const { multiSend, secondAccount } = await loadFixture(deployMultiSendFixture);
-      
+
       const addresses = [secondAccount.address];
       const amounts = [1];
 
       await expect(multiSend.multiSendRose(addresses, amounts)).to.be.revertedWith("Not enough Rose");
     });
-    
+
     it("Should transfer Rose from sender to multiple recipients", async function () {
       const { multiSend, deployerAccount } = await loadFixture(deployMultiSendFixture);
-      
+
       const totalToSend = 20;
       const { address: randomAddress } = ethers.Wallet.createRandom();
       const { address: randomAddressTwo } = ethers.Wallet.createRandom();
-      const addresses = [ randomAddress, randomAddressTwo ];
+      const addresses = [randomAddress, randomAddressTwo];
       const amounts = [15, 5];
 
       const originalSenderBalance = await ethers.provider.getBalance(deployerAccount.address);
@@ -127,16 +127,16 @@ describe("MultiSend", function () {
 
     it("Should return extra Rose back to sender", async function () {
       const { multiSend, deployerAccount } = await loadFixture(deployMultiSendFixture);
-      
+
       const totalToSend = 20;
       const actualSent = 30;
       const { address: randomAddress } = ethers.Wallet.createRandom();
       const { address: randomAddressTwo } = ethers.Wallet.createRandom();
-      const addresses = [ randomAddress, randomAddressTwo ];
+      const addresses = [randomAddress, randomAddressTwo];
       const amounts = [15, 5];
 
       const originalSenderBalance = await ethers.provider.getBalance(deployerAccount.address);
-      
+
       expect(await ethers.provider.getBalance(randomAddress)).to.equal(0);
       expect(await ethers.provider.getBalance(randomAddressTwo)).to.equal(0);
 

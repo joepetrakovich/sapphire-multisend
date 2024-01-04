@@ -1,3 +1,12 @@
+
+export interface Token {
+    name: string,
+    symbol: string,
+    decimals: number,
+    address?: string,
+    isChainNativeCurrency: boolean
+}
+
 export interface Currency {
     name: string,
     symbol: string,
@@ -20,4 +29,3 @@ export enum OasisNetworkStatus {
     ON_DIFFERENT_NETWORK, 
     ON_SAPPHIRE_PARATIME
 };
-

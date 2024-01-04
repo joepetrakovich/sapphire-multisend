@@ -9,3 +9,4 @@ contract MyToken is ERC20, ERC20Burnable {
         _mint(msg.sender, 10000000000 * 10 ** decimals());
     }
 }
+
