@@ -27,7 +27,7 @@
     div {
         display: flex;
         flex-direction: column;
-        gap: 0.2em;
+        gap: 0.4em;
     }
     div > div, label {
         display: flex;

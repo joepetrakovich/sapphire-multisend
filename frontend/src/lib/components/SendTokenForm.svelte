@@ -19,10 +19,9 @@
     let total: bigint;
     let tokenValid: boolean, destinationsValid: boolean;
     let error: string | undefined;
+    let tokenError: string | undefined;
+    let parseError: string | undefined;
 
-    //TODO! changes to $signerAddress also need to invalidate
-    //TODO: what about disconnects?
-    
     const form = fsm('entering', {
         entering: {
             _enter() {
@@ -31,7 +30,6 @@
                 total = 0n;
                 error = undefined;
             },
-
             validate: 'validating'
         },
         validating: {
@@ -69,7 +67,7 @@
                   .then(this.success)
                   .catch(this.error);
             },
-            success() { return 'valid' },
+            success() { return 'validating' },
             error(e) {
                 error = e;
                 return 'invalid';
@@ -93,12 +91,18 @@
         },
         complete: {},
         '*': {
-            input: 'entering'
+            input: 'entering',
+            error(e) {
+                error = e;
+                return 'invalid';
+            }
         }
     });
 
     $: $signerAddress && form.input();
     $: tokenValid && destinationsValid ? form.validate() : form.input();
+    $: parseError ? form.error(parseError) : form.input();
+    $: tokenError ? form.error(tokenError) : form.input();
 
     async function getTokenBalanceAndAllowance() {
         const contract = new ethers.Contract(
@@ -112,33 +116,20 @@
     }
 
     const approve = async () => {
-        //this instance can be cached. does it need to be sapphire wrapped?
-        //let wrapped = sapphire.wrap(window.ethereum);
-        const signer = await new ethers.BrowserProvider(window.ethereum)
-          .getSigner();
-
+        const signer = await new ethers.BrowserProvider(window.ethereum).getSigner();
         const contract = new ethers.Contract(
                  token!.address,
                  GenericERC20.abi,
                  signer
             );
             
-            const tx = await contract.approve(ca.MultiSend, total, { value: 0 });
-            const l = await tx.wait();
-            console.log(l);
-
-            //todo: let fsm call?
-            //todo: wait spinners, fsm can wait.
-   
-            // ?.placeBet(index, Horse[selectedHorse], { gasLimit: 10_000_000, value: betAmountInWei })
-            // .then(receipt => {tx = waitForConfirmation(receipt); (event.target as HTMLFormElement).reset();})
-            // .catch(console.log)
-            // .finally(() => submitting = false)
+        const tx = await contract.approve(ca.MultiSend, total, { value: 0 });
+        await tx.wait();
     }
     
     const send = async () => {
-        //this instance can be cached. does it need to be sapphire wrapped?
-        let wrapped = sapphire.wrap(window.ethereum);
+        //let wrapped = sapphire.wrap(window.ethereum);
+        let wrapped = window.ethereum;
         const signer = await new ethers.BrowserProvider(wrapped).getSigner();
         const multiSendContract = new ethers.Contract(
                  ca.MultiSend,
@@ -149,23 +140,14 @@
         const amountsBigInt = amounts.map(amount => ethers.parseUnits(amount.toString(), token!.decimals));
 
         const tx = await multiSendContract.multiSendToken(token!.address, addresses, amountsBigInt);
-        const l = await tx.wait();
-        console.log(l);
-        
-        //let fsm call? etc etc
-        //fsm can wait etc.
-            
-            // ?.placeBet(index, Horse[selectedHorse], { gasLimit: 10_000_000, value: betAmountInWei })
-            // .then(receipt => {tx = waitForConfirmation(receipt); (event.target as HTMLFormElement).reset();})
-            // .catch(console.log)
-            // .finally(() => submitting = false)
+        await tx.wait();
     }
 </script>
 
 <div>
     <form>
-        <TokenSelector bind:token bind:valid={tokenValid} disabled={!$connectedToSapphire} /> 
-        <DestinationsTextArea bind:addresses bind:amounts bind:valid={destinationsValid} disabled={!$connectedToSapphire}/>
+        <TokenSelector bind:token bind:valid={tokenValid} bind:error={tokenError} disabled={!$connectedToSapphire} /> 
+        <DestinationsTextArea bind:addresses bind:amounts bind:valid={destinationsValid} bind:error={parseError} disabled={!$connectedToSapphire}/>
         
         {#if $connectedToSapphire}
             {#if $form === 'awaitingApproval' || $form === 'approving' }
@@ -174,12 +156,15 @@
                 <button on:click={form.send} disabled={$form !== 'valid'}>{$form === 'sending' ? 'Sending...' : 'Send'}</button>
             {/if}
         {:else}
-            <WalletConnection />
+            <WalletConnection fullWidth={true} />
         {/if}
     </form>
 
-    <details>
-        <summary>state internals</summary>
+    <details class={$form}>
+        <summary>
+            state internals {#if error}(error: {error}){/if}
+            {#if $form === 'complete'}(multisend complete){/if}
+        </summary>
         <span>token valid: {tokenValid}</span>
         <span>destinations valid: {destinationsValid}</span>
         <span>form state: {$form}</span>
@@ -197,11 +182,14 @@
         flex-direction: column;
         gap: 0.2em;
     }
-    button {
-        width: 100%;
-    }
     details {
         font-style: italic;
         color: gray;
+    }
+    details.invalid {
+        color: red;
+    }
+    details.complete {
+        color: green;
     }
 </style>

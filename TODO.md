@@ -1,41 +1,29 @@
 
 ## TODAY
 ----------------
-- token valid -> addresses valid -> 
-- balance > totalToSend
-- allowance > totalToSend (if not, approve button and wait)
-- send
-
-- need a valid -> completed state, overrides input clear?
-0xB643Ec25c66390d1A4A1130d44CE8C1286C05d0B
-
-0x68d3FCA25c214215699E82453630C07f1331EA9D,2
-0xa187beD9FFa27444758407b0E597449F6bAE6B55,300
+DONE - get form working with cleanup
+DONE - show token selected ui
+DONE -- token selector
+DONE - surface errors better
+DONE - show an end state completed checkmark
+- testnet deploy and announce
 
 ## NEXT
 ----------------
-- token valid -> addresses valid -> 
-- balance > totalToSend
-- allowance > totalToSend (if not, approve button and wait)
-- send
-
-clean up styles to show token selected. an end state clear
-then a final cleanup with name, branding, testnet dapp. announcement.
-mainnet after testing
-
--- send does approve (gas estimate first?)
--- query approval, if enough approved for total amount, allow button to change to send button
+- testnet deploy and announce
+- then a final cleanup with name, branding, 
+- mainnet after testing
 - make sure not to allow injection attack
--- on send, estimate gas, send, refresh balance. check
-- clean up styles
-- move on!
-- add a small settable fee
+- find out if I need to use sapphire.wrap or not, and how to get nice function names in metamask.
 
-- eventually could do the massdrop thing with claiming since that would allow
-recall in case of accident or unclaimed. but for now just get this working enough for rosy airdrop
 
 ## NOTES
 ---------------
+0xB643Ec25c66390d1A4A1130d44CE8C1286C05d0B
+
+0x68d3FCA25c214215699E82453630C07f1331EA9D,1.1
+0xa187beD9FFa27444758407b0E597449F6bAE6B55,0.333
+0xe2617555665E6311aB45c4C02cb13f3e4C756166,3.22
 
     it("Should transfer tokens that aren't in whole amounts", async function () {
       const { multiSend, myToken, deployerAccount, secondAccount, thirdAccount } = await loadFixture(deployMultiSendFixture);

@@ -7,10 +7,10 @@
     export let addresses: string[];
     export let amounts: number[];
     export let valid: boolean;
+    export let error: string | undefined;
 
     let text: string;
     let lineNum = 0;
-    let error: string | undefined;
 
     const state = fsm('entering', {
         entering: {
@@ -20,7 +20,7 @@
                 addresses = amounts = [];
             },
             parse() {
-                text = text.trim();  
+                text = text?.trim();  
                 if (text) {
                     return 'parsing';
                 }
@@ -54,19 +54,19 @@
 
         if (results.errors.length) {
             console.log(results.errors);
-            state.error('error parsing addresses and amounts.');
+            state.error('See console for details.');
             parser.abort();
             return;
         }
 
         if (results.data.length != 2) {
-            state.error(`line ${lineNum} not formatted properly.`);
+            state.error(`line ${lineNum} is not formatted properly.`);
             parser.abort();
             return;
         }
 
         if (!ethers.isAddress(results.data[0])) {
-            state.error(`line ${lineNum} not an address.`);
+            state.error(`line ${lineNum} is not a valid address.`);
             parser.abort();
             return;
         }
@@ -81,7 +81,6 @@
 
         addresses = [...addresses, address];
         amounts = [...amounts, amount];
-        //const amount: bigint = ethers.parseUnits(results.data[1], token.decimals);
     }
 
     const complete = () => {
@@ -93,7 +92,11 @@
     const parse = () => Papa.parse(text, { delimiter: ',', step, complete });
 </script>
 
-<textarea rows="10" class={$state} bind:value={text} on:change={state.parse} on:input={state.input} {disabled} placeholder="Enter comma-delimeted addresses and amounts..." />
+<textarea rows="10" class={$state} 
+          bind:value={text} on:blur={state.parse} on:input={state.input} 
+          {disabled} 
+          placeholder="Enter a comma-separated address and amount on each line..." 
+        />
 
 <style>
     .invalid {

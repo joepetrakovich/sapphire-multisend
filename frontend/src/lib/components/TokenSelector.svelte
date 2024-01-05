@@ -3,13 +3,16 @@
     import { type Token } from '$lib/Models';
     import GenericERC20 from "$lib/contracts/GenericERC20.json";
     import fsm from 'svelte-fsm'
+	import TokenView from './TokenView.svelte';
+	import PendingSpinner from './PendingSpinner.svelte';
 
     export let disabled: boolean;
     export let token: Token | undefined;
     export let valid: boolean;
+    export let error: string | undefined;
 
     let address: string;
-    let error: string | undefined;
+    let tx: Promise<any>;
 
     export const state = fsm('entering', {
         entering: {
@@ -22,7 +25,7 @@
         loading: {
             _enter() {
                 address = address.trim();
-                getTokenDetails()
+                tx = getTokenDetails()
                   .then(this.loaded)
                   .catch(this.error)
             },
@@ -33,7 +36,7 @@
             },
 
             error(e) {
-				error = e;
+				error = e.message;
                 return 'invalid';
             }
         },
@@ -64,11 +67,32 @@
         
         return { name, symbol, decimals, address }; 
     }
+
+    const clear = () => {
+        address = '';
+        token = undefined;
+        error = undefined;
+        state.input();
+    }
 </script>
 
-<input type="text" class={$state} bind:value={address} on:change={state.change} on:input={state.input} {disabled} placeholder="Enter a token address..." />
+<div>
+    <input type="text" class={$state} bind:value={address} on:change={state.change} on:input={state.input} {disabled} placeholder="Enter a token address..." />
+    <PendingSpinner message="" {tx} />
+    {#if token}
+        <TokenView name={token.name} symbol={token.symbol} on:clear={clear} />
+    {/if}
+</div>
 
 <style>
+    div {
+        display: flex;
+        align-items: center;
+        gap: 0.2em;
+    }
+    input {
+        flex-grow: 1;
+    }
     .invalid {
         border:2px solid red;
     }
