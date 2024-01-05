@@ -4,7 +4,7 @@
         sans-serif;
     --font-mono: "Fira Mono", monospace;
 
-    --color-bg: #ffdde2b5;
+    --color-bg: #ffffffb5;
     --space-1: 4px;
     --space-2: 8px;
     --space-3: 16px;
@@ -39,4 +39,7 @@
 
 body {
     background: var(--color-bg);
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 1em;
 }

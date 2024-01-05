@@ -17,6 +17,7 @@
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
+		"@types/papaparse": "^5.3.14",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
 		"svelte": "^4.2.7",
@@ -29,6 +30,8 @@
 	"dependencies": {
 		"@oasisprotocol/sapphire-paratime": "^1.2.2",
 		"ethers": "^6.9.0",
-		"ethers-svelte": "^3.2.1"
+		"ethers-svelte": "^3.2.1",
+		"papaparse": "^5.4.1",
+		"svelte-fsm": "^1.2.0"
 	}
 }

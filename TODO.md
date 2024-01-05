@@ -1,22 +1,29 @@
 
 ## TODAY
 ----------------
-DONE - connect wallet
-- implement approve spend
-DONE -- push a test erc20 with tokens
--- push a contract that can do the multisend
--- send tokens to holder
--- 
-
+DONE - get form working with cleanup
+DONE - show token selected ui
+DONE -- token selector
+DONE - surface errors better
+DONE - show an end state completed checkmark
+- testnet deploy and announce
 
 ## NEXT
 ----------------
-- implement the send with gas estimation.
-- clean up styles
-- move on!
+- testnet deploy and announce
+- then a final cleanup with name, branding, 
+- mainnet after testing
+- make sure not to allow injection attack
+- find out if I need to use sapphire.wrap or not, and how to get nice function names in metamask.
+
 
 ## NOTES
 ---------------
+0xB643Ec25c66390d1A4A1130d44CE8C1286C05d0B
+
+0x68d3FCA25c214215699E82453630C07f1331EA9D,1.1
+0xa187beD9FFa27444758407b0E597449F6bAE6B55,0.333
+0xe2617555665E6311aB45c4C02cb13f3e4C756166,3.22
 
     it("Should transfer tokens that aren't in whole amounts", async function () {
       const { multiSend, myToken, deployerAccount, secondAccount, thirdAccount } = await loadFixture(deployMultiSendFixture);

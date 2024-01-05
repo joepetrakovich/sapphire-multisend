@@ -40,9 +40,4 @@ contract MultiSend is Ownable {
             require(success, "Transfer failed.");
         }
     }
-
-    function destroy(address payable to) public onlyOwner {
-        selfdestruct(to);
-    }
-
 }
