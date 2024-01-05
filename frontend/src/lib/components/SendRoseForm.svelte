@@ -1,7 +1,7 @@
 <script lang="ts">
     import DestinationsTextArea from '$lib/components/DestinationsTextArea.svelte';
     import { ethers } from 'ethers';
-    import { connectedToSapphire, signerAddress } from '$lib/Stores';
+    import { connectedToSapphire, fee, multiSendContractUnsigned, signerAddress } from '$lib/Stores';
     import MultiSendArtifact from "$lib/contracts/MultiSend.json";
     import ca from "$lib/contracts/contract-addresses.json";
     import * as sapphire from '@oasisprotocol/sapphire-paratime';
@@ -30,11 +30,11 @@
             _enter() {
                 const totalAsNumberString = amounts.reduce((partialSum, a) => partialSum + a, 0).toString();
                 total = ethers.parseEther(totalAsNumberString);
-        
+                
                 getRoseBalance()
                     .then((roseBalance) => {
                     balance = roseBalance;
-                    if (balance >= total) {
+                    if (balance >= total + $fee) {
                         this.success();
                     } else {
                         this.error('Insufficient Rose balance');
@@ -95,8 +95,8 @@
             );
 
         const amountsBigInt = amounts.map(amount => ethers.parseEther(amount.toString()));
-
-        const receipt = await multiSendContract.multiSendRose(addresses, amountsBigInt, { value: total });
+        const fee = await multiSendContract.fee();
+        const receipt = await multiSendContract.multiSendRose(addresses, amountsBigInt, { value: total + fee });
         await receipt.wait();
     }
 </script>

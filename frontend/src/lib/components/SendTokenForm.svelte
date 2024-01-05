@@ -3,7 +3,7 @@
     import TokenSelector from '$lib/components/TokenSelector.svelte';
     import { ethers } from 'ethers';
     import { type Token } from '$lib/Models';
-    import { connectedToSapphire, signerAddress } from '$lib/Stores';
+    import { connectedToSapphire, fee, signerAddress } from '$lib/Stores';
     import GenericERC20 from "$lib/contracts/GenericERC20.json";
     import MultiSendArtifact from "$lib/contracts/MultiSend.json";
     import ca from "$lib/contracts/contract-addresses.json";
@@ -41,7 +41,10 @@
                     .then(ba => {
                     balance = ba.balance;
                     allowance = ba.allowance;
-                    if (balance < total) {
+                    if (ba.roseBalance < $fee) {
+                        this.error('Insufficient Rose balance to pay fee')
+                    }
+                    else if (balance < total) {
                         this.error('Insufficient token balance')
                     } else if (allowance < total) {
                         this.needsApproval();
@@ -105,15 +108,20 @@
     $: tokenError ? form.error(tokenError) : form.input();
 
     async function getTokenBalanceAndAllowance() {
+        const provider = new ethers.BrowserProvider(window.ethereum);
         const contract = new ethers.Contract(
-                 token!.address,
-                 GenericERC20.abi,
-            new ethers.BrowserProvider(window.ethereum));
+            token!.address,
+            GenericERC20.abi,
+            provider);
 
+        const roseBalance = await provider.getBalance($signerAddress);
         const balance = await contract.balanceOf($signerAddress);
         const allowance = await contract.allowance($signerAddress, ca.MultiSend);
-        return { balance, allowance }
+        
+        return { balance, allowance, roseBalance }
     }
+
+    
 
     const approve = async () => {
         const signer = await new ethers.BrowserProvider(window.ethereum).getSigner();
@@ -138,8 +146,8 @@
             );
 
         const amountsBigInt = amounts.map(amount => ethers.parseUnits(amount.toString(), token!.decimals));
-
-        const tx = await multiSendContract.multiSendToken(token!.address, addresses, amountsBigInt);
+        const fee = await multiSendContract.fee();
+        const tx = await multiSendContract.multiSendToken(token!.address, addresses, amountsBigInt, { value: fee });
         await tx.wait();
     }
 </script>

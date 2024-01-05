@@ -1,6 +1,11 @@
 <script lang="ts">
+    import "../app.css"
     import WalletConnection from "$lib/components/WalletConnection.svelte";
-import "../app.css"
+    import { ethers } from "ethers";
+	import { multiSendContractUnsigned } from "$lib/Stores";
+	import FeeView from "$lib/components/FeeView.svelte";
+	import OwnerWithdraw from "$lib/components/OwnerWithdraw.svelte";
+
 </script>
 <nav>
    <div>
@@ -17,8 +22,14 @@ import "../app.css"
 </main>
 
 <footer>
-    <a href="https://github.com/joepetrakovich/oasis-multisend" target="_blank">Github</a>
-    <a href="https://faucet.testnet.oasis.dev/" target="_blank">Testnet Faucet</a>
+    <div>
+        <FeeView />
+        <div>
+            <a href="https://github.com/joepetrakovich/oasis-multisend" target="_blank">Github</a>
+            <a href="https://faucet.testnet.oasis.dev/" target="_blank">Testnet Faucet</a>
+        </div>
+    </div>
+    <OwnerWithdraw />
 </footer>
 
 <style>
@@ -33,12 +44,27 @@ import "../app.css"
         align-items: center;
     }
     main {
-        margin-bottom: 1em;
+        margin-bottom: 2em;
     }
     footer {
         display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    footer > div {
+        display: flex;
         align-items: center;
         gap: 8px;
-        justify-content: end;
+        justify-content: space-between;
+        font-size: 0.88em;
+        color: gray;
+    }
+    footer > div > div {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    footer a:link, footer a:visited {
+        color: gray;
     }
 </style>

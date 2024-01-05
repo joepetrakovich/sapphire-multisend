@@ -3,8 +3,8 @@ import { getOasisNetworkConnectionStatus } from "./Network";
 import { readable, derived, type Readable, type Subscriber, type Unsubscriber } from "svelte/store";
 import { ethers } from "ethers";
 import * as sapphire from '@oasisprotocol/sapphire-paratime';
-// import RoseDerbyArtifact from "$lib/contracts/RoseDerby.json";
-// import contractAddress from "$lib/contracts/contract-address.json";
+import MultiSendArtifact from "$lib/contracts/MultiSend.json";
+import contractAddress from "$lib/contracts/contract-addresses.json";
 
 export const oasisNetworkStatus = readable<OasisNetworkStatus>(OasisNetworkStatus.INITIALIZING, set => {
     const interval = setInterval(async () => {
@@ -58,34 +58,49 @@ export const signerAddress = readable<string>('', set => {
 //     return matches;
 // }
 
-// export const roseDerbyContract: Readable<ethers.Contract|undefined> = derived([oasisNetworkStatus, signerAddress], ([$networkStatus], set) => {
-//     if ($networkStatus == OasisNetworkStatus.ON_SAPPHIRE_PARATIME) {     
-//         let wrapped = sapphire.wrap(window.ethereum);
-//         const sign = new ethers.BrowserProvider(wrapped)
-//             .getSigner()
-//             .then(signer => {
-//                 set(new ethers.Contract(
-//                     contractAddress.RoseDerby,
-//                     RoseDerbyArtifact.abi,
-//                     signer
-//                 ))
-//             });
-//     } else {
-//         set(undefined);
-//     }
-// });
+export const provider: Readable<ethers.BrowserProvider|undefined> = derived([oasisNetworkStatus, signerAddress], ([$networkStatus], set) => {
+    if ($networkStatus == OasisNetworkStatus.ON_SAPPHIRE_PARATIME) {
+        set(new ethers.BrowserProvider(window.ethereum));
+    } else {
+        set(undefined);
+    }
+});
 
-// export const roseDerbyContractUnsigned: Readable<ethers.Contract|undefined> = derived([oasisNetworkStatus, signerAddress], ([$networkStatus], set) => {
-//     if ($networkStatus == OasisNetworkStatus.ON_SAPPHIRE_PARATIME) {
-//         set(new ethers.Contract(
-//             contractAddress.RoseDerby,
-//             RoseDerbyArtifact.abi,
-//             sapphire.wrap(new ethers.BrowserProvider(window.ethereum))));
-//     } else {
-//         set(undefined);
-//     }
-// });
+export const multiSendContract: Readable<ethers.Contract|undefined> = derived([oasisNetworkStatus, signerAddress], ([$networkStatus], set) => {
+    if ($networkStatus == OasisNetworkStatus.ON_SAPPHIRE_PARATIME) {     
+        let wrapped = sapphire.wrap(window.ethereum);
+        const sign = new ethers.BrowserProvider(wrapped)
+            .getSigner()
+            .then(signer => {
+                set(new ethers.Contract(
+                    contractAddress.MultiSend,
+                    MultiSendArtifact.abi,
+                    signer
+                ))
+            });
+    } else {
+        set(undefined);
+    }
+});
 
+export const multiSendContractUnsigned: Readable<ethers.Contract|undefined> = derived([oasisNetworkStatus, signerAddress], ([$networkStatus], set) => {
+    if ($networkStatus == OasisNetworkStatus.ON_SAPPHIRE_PARATIME) {
+        set(new ethers.Contract(
+            contractAddress.MultiSend,
+            MultiSendArtifact.abi,
+            sapphire.wrap(new ethers.BrowserProvider(window.ethereum))));
+    } else {
+        set(undefined);
+    }
+});
+
+export const fee: Readable<bigint> = derived(multiSendContractUnsigned, ($contract, set) => {
+    if ($contract) {
+        $contract.fee()
+        .then(set)
+        .catch(console.log); 
+    }
+}, BigInt(0));
 
 // export const raceScheduledEvents: Readable<number> = derived(roseDerbyContractUnsigned, ($contract, set) => {
 //     let e;
