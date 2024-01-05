@@ -1,15 +1,28 @@
 
 ## TODAY
 ----------------
-DONE - finish up basic parser validation
-DONE - on parse success, use outputs to check approvals. if amount already approved, allow send button to be clicked.
-DONE -if not enough approved, have approve button clickable.
+- token valid -> addresses valid -> 
+- balance > totalToSend
+- allowance > totalToSend (if not, approve button and wait)
+- send
 
-DONE - implement the send with gas estimation.
 
+0xB643Ec25c66390d1A4A1130d44CE8C1286C05d0B
+
+0x68d3FCA25c214215699E82453630C07f1331EA9D,2
+0xa187beD9FFa27444758407b0E597449F6bAE6B55,300
 
 ## NEXT
 ----------------
+- token valid -> addresses valid -> 
+- balance > totalToSend
+- allowance > totalToSend (if not, approve button and wait)
+- send
+
+clean up styles to show token selected. an end state clear
+then a final cleanup with name, branding, testnet dapp. announcement.
+mainnet after testing
+
 -- send does approve (gas estimate first?)
 -- query approval, if enough approved for total amount, allow button to change to send button
 - make sure not to allow injection attack

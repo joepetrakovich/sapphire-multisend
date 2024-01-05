@@ -5,12 +5,13 @@
     import fsm from 'svelte-fsm'
 
     export let disabled: boolean;
+    export let token: Token | undefined;
+    export let valid: boolean;
 
     let address: string;
-    let token: Token | undefined;
     let error: string | undefined;
 
-    const form = fsm('entering', {
+    export const state = fsm('entering', {
         entering: {
             _enter() {
                 error = undefined;
@@ -44,6 +45,8 @@
         }
     });
 
+    $: valid = $state === 'valid';
+
     const getTokenDetails = async () => {
         if (!ethers.isAddress(address)) {
             throw new Error('not an address');
@@ -63,9 +66,14 @@
     }
 </script>
 
-<input type="text" bind:value={address} on:change={form.change} on:input={form.input} {disabled} placeholder="Enter a token address..." />
-<span>t: {token?.name}</span>
-<span>e: {error}</span>
-<span>form state: {$form}</span>
+<input type="text" class={$state} bind:value={address} on:change={state.change} on:input={state.input} {disabled} placeholder="Enter a token address..." />
 
+<style>
+    .invalid {
+        border:2px solid red;
+    }
+    .valid {
+        border:2px solid lightgreen;
+    }
+</style>
 

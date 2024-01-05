@@ -1,5 +1,5 @@
 <script lang="ts">
-    import WalletConnection from "$lib/WalletConnection.svelte";
+    import WalletConnection from "$lib/components/WalletConnection.svelte";
 import "../app.css"
 </script>
 <nav>

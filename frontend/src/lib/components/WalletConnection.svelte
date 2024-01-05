@@ -1,5 +1,5 @@
 <script lang="ts">
-    import CurrentAccount from '$lib/CurrentAccount.svelte';
+    import CurrentAccount from '$lib/components/CurrentAccount.svelte';
     import { OasisNetworkStatus } from '$lib/Models';
     import { oasisNetworkStatus } from '$lib/Stores';
 	import { OASIS_SAPPHIRE_TESTNET, connectWallet, switchNetworkOrAddIfNotExists } from '$lib/Network';

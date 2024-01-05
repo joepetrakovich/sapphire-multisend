@@ -1,131 +1,120 @@
 <script lang="ts">
-    import TokenSelector from '$lib/TokenSelector.svelte';
+    import DestinationsTextArea from '../lib/components/DestinationsTextArea.svelte';
+    import TokenSelector from '$lib/components/TokenSelector.svelte';
     import { ethers } from 'ethers';
     import Papa from 'papaparse';
     import { OasisNetworkStatus, type Token } from '$lib/Models';
-    import { oasisNetworkStatus, signerAddress } from '$lib/Stores';
+    import { connectedToSapphire, oasisNetworkStatus, signerAddress } from '$lib/Stores';
     import GenericERC20 from "$lib/contracts/GenericERC20.json";
     import MultiSendArtifact from "$lib/contracts/MultiSend.json";
     import ca from "$lib/contracts/contract-addresses.json";
     import * as sapphire from '@oasisprotocol/sapphire-paratime';
-	import WalletConnection from '$lib/WalletConnection.svelte';
+	import WalletConnection from '$lib/components/WalletConnection.svelte';
     import fsm from 'svelte-fsm'
     import OasisLogo from '$lib/images/oasis-logo-120px.png';
     
-    const dapp = fsm('disconnected', {
-        disconnected: {
-            connect: 'connected'
-        },
-        connected: {
-            disconnect: 'disconnected'
-        }
-    });
-
-    const form = fsm('entering', {
-        entering: {},
-        valid: {},
-        invalid: {}
-    });
-
     enum SendType { ERC20Token, Rose }
     let group: SendType = SendType.ERC20Token;
 
-    let token: Token;
+    let token: Token | undefined;
     let balance: bigint;
     let allowance: bigint;
+    let addresses: string[];
+    let amounts: number[];
+    let total: bigint;
+    let tokenValid: boolean, destinationsValid: boolean;
+    let error: string | undefined;
 
-    $: $oasisNetworkStatus !== OasisNetworkStatus.ON_SAPPHIRE_PARATIME ? dapp.disconnect() : dapp.connect();
+    //TODO! changes to $signerAddress also need to invalidate
 
-    $: balanceDisplay = token && balance ? ethers.formatUnits(balance, token.decimals) : '';
-    $: allowanceDisplay = token && allowance ? ethers.formatUnits(allowance, token.decimals) : '';
+    const form = fsm('entering', {
+        entering: {
+            _enter() {
+                balance = 0n;
+                allowance = 0n;
+                total = 0n;
+                error = undefined;
+            },
 
-    let text: string;
-    let addressesAndAmounts: { address: string, amount: bigint }[] = [];
-    let lineNum = 0;
-
-    let totalToSend: number;
-
-    $: needsApproval = !token?.isChainNativeCurrency && allowance < totalToSend
-
-    const getTokenBalanceAndAllowance = async () => {
-        if (token.isChainNativeCurrency) {
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            balance = await provider.getBalance($signerAddress);
-        } else {
-            const contract = new ethers.Contract(
-                 token.address!,
-                 GenericERC20.abi,
-            new ethers.BrowserProvider(window.ethereum));
-
-            balance = await contract.balanceOf($signerAddress);
-            allowance = await contract.allowance($signerAddress, ca.MultiSend);
-        }
-    }
-
-    const step = (results: any, parser: any) => {
-        lineNum += 1;
-        if (results.errors.length) {
-            alert('error parsing addresses and amounts.');
-            console.log(results.errors);
-            parser.abort();
-            return;
-        }
-
-        if (results.data.length != 2) {
-            alert(`line ${lineNum} not formatted properly.`);
-            parser.abort();
-            return;
-        }
-
-        if (!ethers.isAddress(results.data[0])) { //do I need to verify its a saph addr?
-            alert(`line ${lineNum} not an address.`);
-            parser.abort();
-            return;
-        }
-        const address = results.data[0];
-
-        const amountFloat = parseFloat(results.data[1]);
-        if (Number.isNaN(amountFloat) || amountFloat <= 0) {
-            alert(`line ${lineNum} amount must be a number greater than 0.`);
-            parser.abort();
-            return;
-        }
-        totalToSend += amountFloat;
-        const amount: bigint = ethers.parseUnits(results.data[1], token.decimals);
-
-        addressesAndAmounts = [...addressesAndAmounts, { address, amount }];
-    }
-    const complete = () => {
-        alert(`processed ${lineNum} lines`);
-        validateSend();
-    }
-    const parse = async () => {
-        lineNum = 0; //would this lose error'd line num?
-        totalToSend = 0;
-        addressesAndAmounts = [];
-
-        Papa.parse(text, { delimiter: ',', step, complete });
-        //may need transform, step, error, complete
-    };
-
-    async function validateSend() {
-        //check sufficient balance 
-        //check allowance for erc20s
+            validate: 'validating'
+        },
+        validating: {
+            _enter() {
+                const totalAsNumberString = amounts.reduce((partialSum, a) => partialSum + a, 0).toString();
+                total = ethers.parseUnits(totalAsNumberString, group === SendType.Rose ? 18 : token!.decimals);
         
-        if (token.isChainNativeCurrency) {
-            // no allowance, just need enough balance.
-            // const provider = new ethers.BrowserProvider(window.ethereum);
-            // const roseBalance = await provider.getBalance($signerAddress);
-            // balance = ethers.formatEther(roseBalance);
-        } else {
-            const contract = new ethers.Contract(
-                 token.address!,
+                if (group === SendType.Rose) {
+                    getRoseBalance()
+                      .then((roseBalance) => {
+                        balance = roseBalance;
+                        if (balance >= total) {
+                            this.success();
+                        } else {
+                            this.error('Insufficient Rose balance');
+                        }
+                      })
+                      .catch(this.error);
+                } else {
+                    getTokenBalanceAndAllowance()
+                      .then(ba => {
+                        balance = ba.balance;
+                        allowance = ba.allowance;
+                        if (balance < total) {
+                            this.error('Insufficient token balance')
+                        } else if (allowance < total) {
+                            this.needsApproval();
+                        } else {
+                            this.success();
+                        }
+                      })
+                      .catch(this.error);
+                }
+            },
+            needsApproval() {return 'awaitingApproval'},
+            success() { return 'valid' },
+            error(e) {
+                error = e;
+                return 'invalid';
+            },
+        },
+        awaitingApproval: {
+            approve: 'approving'
+        },
+        approving: {
+            _enter() {
+                //approve async func
+            },
+            success() { return 'valid' },
+            error(e) {
+                error = e;
+                return 'invalid';
+            }
+        },
+        invalid: {},
+        valid: {},
+        '*': {
+            input: 'entering'
+        }
+    });
+
+    $: $signerAddress && form.input();
+    $: group && form.input();
+    $: destinationsValid && (group === SendType.Rose || tokenValid) ? form.validate() : form.input();
+
+    async function getRoseBalance() {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        return await provider.getBalance($signerAddress);
+    }
+
+    async function getTokenBalanceAndAllowance() {
+        const contract = new ethers.Contract(
+                 token!.address,
                  GenericERC20.abi,
             new ethers.BrowserProvider(window.ethereum));
 
-            let allowance:bigint = await contract.allowance($signerAddress, ca.MultiSend);
-            allowanceDisplay = ethers.formatUnits(allowance, token.decimals);
-        }
+        const balance = await contract.balanceOf($signerAddress);
+        const allowance = await contract.allowance($signerAddress, ca.MultiSend);
+        return { balance, allowance }
     }
 
     const approve = async () => {
@@ -165,9 +154,9 @@
                  signer
             );
 
-        const addresses = addressesAndAmounts.map(aa => aa.address);
-        const amounts = addressesAndAmounts.map(aa => aa.amount);
-        const totalSendAmount: BigInt = ethers.parseEther(totalToSend.toString()); 
+        //const addresses = addressesAndAmounts.map(aa => aa.address);
+        //const amounts = addressesAndAmounts.map(aa => aa.amount);
+        const totalSendAmount: BigInt = ethers.parseEther(total.toString()); 
 
         if (token.isChainNativeCurrency) {
             //estimate gas?
@@ -187,32 +176,42 @@
             // .catch(console.log)
             // .finally(() => submitting = false)
     }
-
 </script>
 
 <div>
     <form>
         <div>
             What are you sending?
-            <label><input type="radio" value={SendType.ERC20Token} bind:group disabled={$dapp !== 'connected'} />Token</label>
-            <label><input type="radio" value={SendType.Rose} bind:group disabled={$dapp !== 'connected'} /><img src={OasisLogo} alt="Oasis Logo" width="16" />Rose</label>
+            <label><input type="radio" value={SendType.ERC20Token} bind:group disabled={!$connectedToSapphire} />Token</label>
+            <label><input type="radio" value={SendType.Rose} bind:group disabled={!$connectedToSapphire} /><img src={OasisLogo} alt="Oasis Logo" width="16" />Rose</label>
         </div>
         
         {#if group === SendType.ERC20Token}
-            <TokenSelector disabled={$dapp !== 'connected'} /> 
+            <TokenSelector bind:token bind:valid={tokenValid} disabled={!$connectedToSapphire} /> 
         {/if}
 
-       <textarea rows="10" disabled={$dapp !== 'connected'} placeholder="Enter comma-delimeted addresses and amounts..." />
-
-        {#if $dapp === 'connected'}
-            <button disabled={$form !== 'valid'}>Send</button>
+        <DestinationsTextArea bind:addresses bind:amounts bind:valid={destinationsValid} disabled={!$connectedToSapphire}/>
+        
+        {#if $connectedToSapphire}
+            {#if $form === 'awaitingApproval'}
+                <button>Approve</button>
+            {:else}
+                <button disabled={$form !== 'valid'}>Send</button>
+            {/if}
         {:else}
             <WalletConnection />
         {/if}
     </form>
 
-    <span>dapp state: {$dapp}</span>
+    <span>token valid: {tokenValid}</span>
+    <span>destinations valid: {destinationsValid}</span>
     <span>form state: {$form}</span>
+    <span>token: {group === SendType.Rose ? 'Rose' : token?.name || ''}</span>
+    <span>balance: {ethers.formatUnits(balance, group === SendType.Rose ? 18 : token?.decimals)}</span>
+    <span>allowance: {ethers.formatUnits(allowance, group === SendType.Rose ? 18 : token?.decimals)}</span>
+    <span>total to send: {ethers.formatUnits(total, group === SendType.Rose ? 18 : token?.decimals)}</span>
+    <span>error: {error}</span>
+
 </div>
 
 <style>
