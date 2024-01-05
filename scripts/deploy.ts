@@ -8,12 +8,13 @@ async function main() {
   const MyToken = await ethers.getContractFactory("MyToken");
   const MultiSend = await ethers.getContractFactory("MultiSend");
   const myToken = await MyToken.deploy();
-  const multiSend = await MultiSend.deploy(deployerAddress);
+  const initialFee = ethers.parseEther('10');
+  const multiSend = await MultiSend.deploy(deployerAddress, initialFee);
   await myToken.waitForDeployment();
   await multiSend.waitForDeployment();
 
   console.log(`MyToken deployed to ${await myToken.getAddress()}`);
-  console.log(`MultiSend deployed to ${await multiSend.getAddress()}`);
+  console.log(`MultiSend deployed to ${await multiSend.getAddress()} with initial fee: ${ethers.formatEther(initialFee)} Rose`);
 }
 
 main().catch((error) => {

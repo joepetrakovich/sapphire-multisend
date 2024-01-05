@@ -6,10 +6,13 @@ DONE - show token selected ui
 DONE -- token selector
 DONE - surface errors better
 DONE - show an end state completed checkmark
-- add a small fee
--- add tests for new paths, fee refund paths. withdraw.
--- add way to withdraw fee if owner wallet
-- testnet deploy and announce
+DONE - add a small fee to contract
+DONE -- add tests for new paths, fee refund paths. withdraw.
+DONE -- display fee
+DONE - add favicon
+DONE -- update UI to ensure fee is included with send tx as well as in validation.
+DONE -- add way to withdraw fee if owner wallet on dapp
+
 
 ## NEXT
 ----------------
