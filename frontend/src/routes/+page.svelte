@@ -24,6 +24,11 @@
 </div>
 
 <style>
+    div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2em;
+    }
     div > div, label {
         display: flex;
         flex-direction: row;

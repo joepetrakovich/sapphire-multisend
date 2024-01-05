@@ -22,7 +22,7 @@
 
     //TODO! changes to $signerAddress also need to invalidate
     //TODO: what about disconnects?
-    
+
     const form = fsm('entering', {
         entering: {
             _enter() {
@@ -57,7 +57,22 @@
             },
         },
         invalid: {},
-        valid: {},
+        valid: {
+            send: 'sending'
+        },
+        sending: {
+            _enter() {
+                send()
+                  .then(this.success)
+                  .catch(this.error);
+            },
+            success() { return 'complete' },
+            error(e) {
+                error = e;
+                return 'invalid';
+            }
+        },
+        complete: {},
         '*': {
             input: 'entering'
         }
@@ -72,7 +87,6 @@
     }
     
     const send = async () => {
-        //this instance can be cached. does it need to be sapphire wrapped?
         let wrapped = sapphire.wrap(window.ethereum);
         const signer = await new ethers.BrowserProvider(wrapped).getSigner();
         const multiSendContract = new ethers.Contract(
@@ -81,23 +95,19 @@
                  signer
             );
 
-        //const addresses = addressesAndAmounts.map(aa => aa.address);
-        //const amounts = addressesAndAmounts.map(aa => aa.amount);
-        const totalSendAmount: BigInt = ethers.parseEther(total.toString()); 
+        const amountsBigInt = amounts.map(amount => ethers.parseEther(amount));
 
-        if (token.isChainNativeCurrency) {
-            //estimate gas?
-            const tx = await multiSendContract.multiSendRose(addresses, amounts, { value: totalSendAmount });
-            const l = await tx.wait();
-            console.log(l);
-        } else {           
-            //estimate gas?
-            const tx = await multiSendContract.multiSendToken(token.address, addresses, amounts);
-            const l = await tx.wait();
-            console.log(l);
-        }
+        const receipt = await multiSendContract.multiSendRose(addresses, amountsBigInt, { value: total });
+        const tx = await receipt.wait();
+        console.log(tx);
 
-            
+        //do then() version? 
+        //tell fsm done? let fsm call send?
+
+        // //const addresses = addressesAndAmounts.map(aa => aa.address);
+        // //const amounts = addressesAndAmounts.map(aa => aa.amount);
+        // const totalSendAmount: BigInt = ethers.parseEther(total.toString()); 
+
             // ?.placeBet(index, Horse[selectedHorse], { gasLimit: 10_000_000, value: betAmountInWei })
             // .then(receipt => {tx = waitForConfirmation(receipt); (event.target as HTMLFormElement).reset();})
             // .catch(console.log)
@@ -110,71 +120,33 @@
         <DestinationsTextArea bind:addresses bind:amounts bind:valid={destinationsValid} disabled={!$connectedToSapphire}/>
         
         {#if $connectedToSapphire}
-            <button disabled={$form !== 'valid'}>Send</button> 
+            <button on:click={form.send} disabled={$form !== 'valid'}>{$form === 'sending' ? 'Sending...' : 'Send'}</button> 
         {:else}
             <WalletConnection />
         {/if}
     </form>
-
-    <span>destinations valid: {destinationsValid}</span>
-    <span>form state: {$form}</span>
-    <span>balance: {ethers.formatEther(balance)}</span>
-    <span>total to send: {ethers.formatEther(balance)}</span>
-    <span>error: {error}</span>
-
+  
+    <details>
+        <summary>state internals</summary>
+        <span>destinations valid: {destinationsValid}</span>
+        <span>form state: {$form}</span>
+        <span>balance: {ethers.formatEther(balance)}</span>
+        <span>total to send: {ethers.formatEther(balance)}</span>
+        <span>error: {error}</span>
+    </details>
 </div>
 
 <style>
-    div, form {
+    div, form, details {
         display: flex;
         flex-direction: column;
         gap: 0.2em;
     }
-    form :global(button) {
+    button {
         width: 100%;
+    }
+    details {
+        font-style: italic;
+        color: gray;
     }
 </style>
-
-<!-- 
-Name: {token?.name || ''}
-Symbol: {token?.symbol || ''}
-Decimals: {token?.decimals || ''}
-Balance: {balanceDisplay}
-
-<div>
-    <TokenSelector bind:token on:tokenselected={getTokenBalanceAndAllowance} /> 
-    <textarea bind:value={text} on:change={parse} rows="10" placeholder="Enter a comma-separated list of address, value pairs..."></textarea>
-   
-    {#if $oasisNetworkStatus !== OasisNetworkStatus.ON_SAPPHIRE_PARATIME}
-        <WalletConnection />
-    {:else}
-        {#if needsApproval}
-            <button on:click={approve}>Approve</button>
-        {:else}
-            <button on:click={send}>Send</button>       
-        {/if}
-    {/if}
-
-    <ul>
-        {#each addressesAndAmounts as pair}
-            <li>{pair.address}, {pair.amount.toString()}</li>
-        {/each}
-    </ul>
-
-    Total {token?.symbol || ''} to send: {totalToSend || ''}
-
-    {#if token && !token.isChainNativeCurrency}
-        Spend Allowance: {allowanceDisplay}
-    {/if}
-</div>
-
-<style>
-    div {
-        display: flex;
-        flex-direction: column;
-        background-color: white;
-    }
-    div :global(button) {
-        width: 100%;
-    }
-</style> -->

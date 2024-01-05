@@ -6,7 +6,7 @@
 - allowance > totalToSend (if not, approve button and wait)
 - send
 
-
+- need a valid -> completed state, overrides input clear?
 0xB643Ec25c66390d1A4A1130d44CE8C1286C05d0B
 
 0x68d3FCA25c214215699E82453630C07f1331EA9D,2
