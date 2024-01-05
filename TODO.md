@@ -6,6 +6,9 @@ DONE - show token selected ui
 DONE -- token selector
 DONE - surface errors better
 DONE - show an end state completed checkmark
+- add a small fee
+-- add tests for new paths, fee refund paths. withdraw.
+-- add way to withdraw fee if owner wallet
 - testnet deploy and announce
 
 ## NEXT

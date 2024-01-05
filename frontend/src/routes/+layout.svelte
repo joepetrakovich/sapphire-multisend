@@ -19,6 +19,7 @@ import "../app.css"
 <footer>
     <a href="https://github.com/joepetrakovich/oasis-multisend" target="_blank">Github</a>
     <a href="https://faucet.testnet.oasis.dev/" target="_blank">Testnet Faucet</a>
+    <span>Fee: 0</span>
 </footer>
 
 <style>
@@ -40,5 +41,13 @@ import "../app.css"
         align-items: center;
         gap: 8px;
         justify-content: end;
+        font-size: 0.88em;
+        color: gray;
+    }
+    footer span {
+        font-size: 1em;
+    }
+    footer a:link, footer a:visited {
+        color: gray;
     }
 </style>
