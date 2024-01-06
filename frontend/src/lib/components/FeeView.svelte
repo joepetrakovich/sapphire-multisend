@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { fee } from "$lib/Stores";
 	import { ethers } from "ethers";
-
 </script>
 
 <span>

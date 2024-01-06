@@ -1,6 +1,6 @@
 import { OasisNetworkStatus } from "./Models";
 import { getOasisNetworkConnectionStatus } from "./Network";
-import { readable, derived, type Readable, type Subscriber, type Unsubscriber } from "svelte/store";
+import { readable, derived, type Readable } from "svelte/store";
 import { ethers } from "ethers";
 import * as sapphire from '@oasisprotocol/sapphire-paratime';
 import MultiSendArtifact from "$lib/contracts/MultiSend.json";
@@ -17,12 +17,11 @@ export const oasisNetworkStatus = readable<OasisNetworkStatus>(OasisNetworkStatu
     }
 });
 
-export const connectedToSapphire: Readable<boolean> = derived(oasisNetworkStatus, ($oasisNetworkStatus) => $oasisNetworkStatus == OasisNetworkStatus.ON_SAPPHIRE_PARATIME);
-
 export const signerAddress = readable<string>('', set => {
     const interval = setInterval(async () => {
         if (window.ethereum) {
-            set(window.ethereum.selectedAddress);
+            const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+            set(accounts?.length ? accounts[0] : '');
         }
     }, 1000);
 
@@ -31,144 +30,48 @@ export const signerAddress = readable<string>('', set => {
     }
 });
 
-// export const genericERC20Contract: Readable<ethers.Contract | undefined> = derived([oasisNetworkStatus, signerAddress], ([$networkStatus], set) => {
-//     if ($networkStatus == OasisNetworkStatus.ON_SAPPHIRE_PARATIME) {
-//         set(new ethers.Contract(
-//                 contractAddress.RoseDerby,
-//                 RoseDerbyArtifact.abi,
-//                 new ethers.BrowserProvider(window.ethereum))
-//         );
-//     } else {
-//         set(undefined);
-//     }
-// });
+export const connectedToSapphire: Readable<boolean> = derived(oasisNetworkStatus, ($oasisNetworkStatus) => $oasisNetworkStatus === OasisNetworkStatus.ON_SAPPHIRE_PARATIME);
 
-
-// export const tokenContract: (address: string) => Readable<ethers.Contract> = (address: string) => {
-//     const contract = readable(false, (set) => {
-//         const m: MediaQueryList = window.matchMedia(mediaQueryString);
-//         set(m.matches);
-
-//         const listener: (this: MediaQueryList, ev: MediaQueryListEvent) => any = e => set(e.matches);
-//         m.addEventListener("change", listener);
-
-//         return () => m.removeEventListener("change", listener);
-//     });
-
-//     return matches;
-// }
-
-export const provider: Readable<ethers.BrowserProvider|undefined> = derived([oasisNetworkStatus, signerAddress], ([$networkStatus], set) => {
-    if ($networkStatus == OasisNetworkStatus.ON_SAPPHIRE_PARATIME) {
-        set(new ethers.BrowserProvider(window.ethereum));
-    } else {
-        set(undefined);
-    }
+export const provider: Readable<ethers.BrowserProvider|undefined> = derived([connectedToSapphire, signerAddress], ([$connected], set) => {
+    $connected ? set(sapphire.wrap(new ethers.BrowserProvider(window.ethereum))) : set(undefined);
 });
 
-export const multiSendContract: Readable<ethers.Contract|undefined> = derived([oasisNetworkStatus, signerAddress], ([$networkStatus], set) => {
-    if ($networkStatus == OasisNetworkStatus.ON_SAPPHIRE_PARATIME) {     
-        let wrapped = sapphire.wrap(window.ethereum);
-        const sign = new ethers.BrowserProvider(wrapped)
-            .getSigner()
-            .then(signer => {
-                set(new ethers.Contract(
-                    contractAddress.MultiSend,
-                    MultiSendArtifact.abi,
-                    signer
-                ))
-            });
-    } else {
-        set(undefined);
-    }
+export const unwrappedProvider: Readable<ethers.BrowserProvider|undefined> = derived([connectedToSapphire, signerAddress], ([$connected], set) => {
+    $connected ? set(new ethers.BrowserProvider(window.ethereum)) : set(undefined);
 });
 
-export const multiSendContractUnsigned: Readable<ethers.Contract|undefined> = derived([oasisNetworkStatus, signerAddress], ([$networkStatus], set) => {
-    if ($networkStatus == OasisNetworkStatus.ON_SAPPHIRE_PARATIME) {
+export const signer: Readable<ethers.JsonRpcSigner|undefined> = derived(provider, ($provider, set) => {
+    $provider ? $provider.getSigner().then(set) : set(undefined);
+});
+
+export const unwrappedSigner: Readable<ethers.JsonRpcSigner|undefined> = derived(unwrappedProvider, ($unwrappedProvider, set) => {
+    $unwrappedProvider ? $unwrappedProvider.getSigner().then(set) : set(undefined);
+});
+
+export const multiSend: Readable<ethers.Contract|undefined> = derived(signer, ($signer, set) => {
+    if ($signer) {
         set(new ethers.Contract(
             contractAddress.MultiSend,
             MultiSendArtifact.abi,
-            sapphire.wrap(new ethers.BrowserProvider(window.ethereum))));
+            $signer
+        ))
     } else {
         set(undefined);
     }
 });
 
-export const fee: Readable<bigint> = derived(multiSendContractUnsigned, ($contract, set) => {
-    if ($contract) {
-        $contract.fee()
-        .then(set)
-        .catch(console.log); 
+export const unwrappedMultiSend: Readable<ethers.Contract|undefined> = derived(unwrappedSigner, ($unwrappedSigner, set) => {
+    if ($unwrappedSigner) {
+        set(new ethers.Contract(
+            contractAddress.MultiSend,
+            MultiSendArtifact.abi,
+            $unwrappedSigner
+        ))
+    } else {
+        set(undefined);
     }
+});
+
+export const fee: Readable<bigint> = derived(unwrappedMultiSend, ($unwrappedMultiSend, set) => {
+    $unwrappedMultiSend?.fee().then(set);
 }, BigInt(0));
-
-// export const raceScheduledEvents: Readable<number> = derived(roseDerbyContractUnsigned, ($contract, set) => {
-//     let e;
-//     if ($contract) {
-//         $contract.on(Events.RaceScheduled, (index, event) => {
-//             e = event;
-//             set(index);
-//           });
-//     }
-//     return () => e?.removeListener();
-// });
-
-// export const betPlacedEvents: Readable<{index: number, horse: Horse, amount: bigint}> = derived(roseDerbyContractUnsigned, ($contract, set) => {
-//     let e;
-//     if ($contract) {
-//         $contract.on(Events.BetPlaced, (index, horse, amount, event) => {
-//             e = event;
-//             set({index, horse, amount});
-//           });
-//     }
-//     return () => e?.removeListener();
-// });
-
-// export const raceResultsDeterminedEvents: Readable<{index: number, results: bigint[]}|undefined> = derived(roseDerbyContractUnsigned, ($contract, set) => {
-//     let e;
-//     if ($contract) {
-//         $contract.on(Events.RaceResultsDetermined, (index, results, event) => {
-//             e = event;
-//             set({index, results});
-//           });
-//     }
-//     return () => e?.removeListener();
-// }, undefined);
-
-// export const horseWins: Readable<bigint[]> = derived(roseDerbyContractUnsigned, ($contract, set) => {
-//     if ($contract) {
-//         $contract.getHorseWins()
-//         .then(set)
-//         .catch(console.log); 
-//     }
-// }, [0n,0n,0n,0n,0n]);
-
-// export const races: Readable<Race[]> = derived(roseDerbyContractUnsigned, ($contract, set) => {
-//     if ($contract) {
-//         $contract.getRaces()
-//         .then(races => set(races))
-//         .catch(console.log); 
-//     }
-// }, []);
-
-// export const globalAmountWon: Readable<bigint> = derived(roseDerbyContractUnsigned, ($contract, set) => {
-//     if ($contract) {
-//         $contract.totalWon()
-//         .then(set)
-//         .catch(console.log); 
-//     }
-// }, BigInt(0));
-
-export const useMediaQuery: (mediaQueryString: string) => Readable<boolean> = (mediaQueryString: string) => {
-    const matches = readable(false, (set) => {
-        const m: MediaQueryList = window.matchMedia(mediaQueryString);
-        set(m.matches);
-
-        const listener: (this: MediaQueryList, ev: MediaQueryListEvent) => any = e => set(e.matches);
-        m.addEventListener("change", listener);
-
-        return () => m.removeEventListener("change", listener);
-    });
-
-    return matches;
-}

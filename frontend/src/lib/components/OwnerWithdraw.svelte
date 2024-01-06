@@ -1,26 +1,27 @@
 <script lang="ts">
-	import { multiSendContractUnsigned, multiSendContract, provider, signerAddress } from "$lib/Stores";
+	import { unwrappedMultiSend, unwrappedProvider, signerAddress } from "$lib/Stores";
 	import { ethers } from "ethers";
     import contractAddress from "$lib/contracts/contract-addresses.json";
 
     let owner: string;
     let balance: bigint;
 
-    $: $multiSendContractUnsigned?.owner().then(o => owner = o);
-    $: $provider?.getBalance(contractAddress.MultiSend).then(b => balance = b);
+    $: $unwrappedMultiSend?.owner().then(o => owner = o);
+    $: $unwrappedProvider?.getBalance(contractAddress.MultiSend).then(b => balance = b);
     $: isOwner = owner && $signerAddress && owner.toLowerCase() === $signerAddress.toLowerCase();
 
     let withdrawing: boolean;
     const withdraw = async () => {
-        if ($multiSendContract) {
+        if ($unwrappedMultiSend) {
             withdrawing = true;
-            $multiSendContract
+            $unwrappedMultiSend
             .withdraw()
             .then(receipt => {
                 return receipt.wait()
                 .then(() => {
-                    $provider?.getBalance(contractAddress.MultiSend)
-                              .then(b => balance = b);
+                    $unwrappedProvider
+                       ?.getBalance(contractAddress.MultiSend)
+                        .then(b => balance = b);
                 })
             })
             .catch(console.log)

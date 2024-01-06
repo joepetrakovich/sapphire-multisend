@@ -1,22 +1,12 @@
 
 ## TODAY
 ----------------
-DONE - get form working with cleanup
-DONE - show token selected ui
-DONE -- token selector
-DONE - surface errors better
-DONE - show an end state completed checkmark
-DONE - add a small fee to contract
-DONE -- add tests for new paths, fee refund paths. withdraw.
-DONE -- display fee
-DONE - add favicon
-DONE -- update UI to ensure fee is included with send tx as well as in validation.
-DONE -- add way to withdraw fee if owner wallet on dapp
-
+DONE - refactor selectedAddress
+- testnet deploy and announce
 
 ## NEXT
 ----------------
-- testnet deploy and announce
+
 - then a final cleanup with name, branding, 
 - mainnet after testing
 - make sure not to allow injection attack

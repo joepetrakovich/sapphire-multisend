@@ -6,7 +6,6 @@
     
     enum SendType { ERC20Token, Rose }
     let group: SendType = SendType.ERC20Token;
-
 </script>
 
 <div>

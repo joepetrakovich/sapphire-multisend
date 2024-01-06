@@ -1,11 +1,8 @@
 <script lang="ts">
     import "../app.css"
     import WalletConnection from "$lib/components/WalletConnection.svelte";
-    import { ethers } from "ethers";
-	import { multiSendContractUnsigned } from "$lib/Stores";
 	import FeeView from "$lib/components/FeeView.svelte";
 	import OwnerWithdraw from "$lib/components/OwnerWithdraw.svelte";
-
 </script>
 <nav>
    <div>

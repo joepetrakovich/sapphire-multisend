@@ -3,11 +3,9 @@
     import TokenSelector from '$lib/components/TokenSelector.svelte';
     import { ethers } from 'ethers';
     import { type Token } from '$lib/Models';
-    import { connectedToSapphire, fee, signerAddress } from '$lib/Stores';
+    import { connectedToSapphire, fee, signerAddress, unwrappedMultiSend, unwrappedProvider, unwrappedSigner } from '$lib/Stores';
     import GenericERC20 from "$lib/contracts/GenericERC20.json";
-    import MultiSendArtifact from "$lib/contracts/MultiSend.json";
     import ca from "$lib/contracts/contract-addresses.json";
-    import * as sapphire from '@oasisprotocol/sapphire-paratime';
 	import WalletConnection from '$lib/components/WalletConnection.svelte';
     import fsm from 'svelte-fsm'
 
@@ -108,47 +106,34 @@
     $: tokenError ? form.error(tokenError) : form.input();
 
     async function getTokenBalanceAndAllowance() {
-        const provider = new ethers.BrowserProvider(window.ethereum);
         const contract = new ethers.Contract(
             token!.address,
             GenericERC20.abi,
-            provider);
+            $unwrappedProvider!);
 
-        const roseBalance = await provider.getBalance($signerAddress);
+        const roseBalance = await $unwrappedProvider!.getBalance($signerAddress);
         const balance = await contract.balanceOf($signerAddress);
         const allowance = await contract.allowance($signerAddress, ca.MultiSend);
         
         return { balance, allowance, roseBalance }
     }
 
-    
-
     const approve = async () => {
-        const signer = await new ethers.BrowserProvider(window.ethereum).getSigner();
         const contract = new ethers.Contract(
                  token!.address,
                  GenericERC20.abi,
-                 signer
+                 $unwrappedSigner!
             );
             
         const tx = await contract.approve(ca.MultiSend, total, { value: 0 });
         await tx.wait();
     }
-    
-    const send = async () => {
-        //let wrapped = sapphire.wrap(window.ethereum);
-        let wrapped = window.ethereum;
-        const signer = await new ethers.BrowserProvider(wrapped).getSigner();
-        const multiSendContract = new ethers.Contract(
-                 ca.MultiSend,
-                 MultiSendArtifact.abi,
-                 signer
-            );
 
+    const send = async () => {
         const amountsBigInt = amounts.map(amount => ethers.parseUnits(amount.toString(), token!.decimals));
-        const fee = await multiSendContract.fee();
-        const tx = await multiSendContract.multiSendToken(token!.address, addresses, amountsBigInt, { value: fee });
-        await tx.wait();
+        const fee = await $unwrappedMultiSend!.fee();
+        const receipt = await $unwrappedMultiSend!.multiSendToken(token!.address, addresses, amountsBigInt, { value: fee });
+        await receipt.wait();
     }
 </script>
 
