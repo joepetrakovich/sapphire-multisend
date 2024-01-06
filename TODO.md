@@ -2,14 +2,17 @@
 ## TODAY
 ----------------
 DONE - refactor selectedAddress
-- testnet deploy and announce
+- testnet deploy
+- verify testnet contract
 
 ## NEXT
 ----------------
 - then a final cleanup with name, branding, 
 - mainnet after testing
-- make sure not to allow injection attack
-- find out if I need to use sapphire.wrap or not, and how to get nice function names in metamask.
+- get guidance on ethers v6 and sapphire.wrap.
+  Currently using unwrapped providers because they don't seem to be
+  doing anything either way and I don't have any view calls that use
+  msg.sender. for now its testnet so nbd
 
 
 ## NOTES
