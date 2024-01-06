@@ -29,6 +29,7 @@
 	"type": "module",
 	"dependencies": {
 		"@oasisprotocol/sapphire-paratime": "^1.2.2",
+		"@sveltejs/adapter-netlify": "^3.0.1",
 		"ethers": "^6.9.0",
 		"ethers-svelte": "^3.2.1",
 		"papaparse": "^5.4.1",
