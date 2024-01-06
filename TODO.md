@@ -6,7 +6,6 @@ DONE - refactor selectedAddress
 
 ## NEXT
 ----------------
-
 - then a final cleanup with name, branding, 
 - mainnet after testing
 - make sure not to allow injection attack

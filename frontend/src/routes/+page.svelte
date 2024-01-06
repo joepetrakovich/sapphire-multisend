@@ -11,7 +11,7 @@
 <div>
     <div>
         What are you sending?
-        <label><input type="radio" value={SendType.ERC20Token} bind:group disabled={!$connectedToSapphire} />Token</label>
+        <label><input type="radio" value={SendType.ERC20Token} bind:group disabled={!$connectedToSapphire} />Tokens</label>
         <label><input type="radio" value={SendType.Rose} bind:group disabled={!$connectedToSapphire} /><img src={OasisLogo} alt="Oasis Logo" width="16" />Rose</label>
     </div>
 
