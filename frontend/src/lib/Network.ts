@@ -80,13 +80,14 @@ export async function getOasisNetworkConnectionStatus(): Promise<OasisNetworkSta
         if (!window.ethereum) {
             return OasisNetworkStatus.PROVIDER_NOT_FOUND;
         }
+ 
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (!accounts?.length) {
+            return OasisNetworkStatus.WALLET_NOT_CONNECTED;
+        }
 
         const provider = new ethers.BrowserProvider(window.ethereum);
         const network = await provider.getNetwork();
-
-        if (!window.ethereum.selectedAddress) {
-            return OasisNetworkStatus.WALLET_NOT_CONNECTED;
-        }
 
         if (network.chainId.toString() === OASIS_SAPPHIRE_TESTNET.chainIdDecimal.toString()) {
             return OasisNetworkStatus.ON_SAPPHIRE_PARATIME;

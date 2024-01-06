@@ -1,10 +1,7 @@
 <script lang="ts">
     import DestinationsTextArea from '$lib/components/DestinationsTextArea.svelte';
     import { ethers } from 'ethers';
-    import { connectedToSapphire, fee, multiSendContractUnsigned, signerAddress } from '$lib/Stores';
-    import MultiSendArtifact from "$lib/contracts/MultiSend.json";
-    import ca from "$lib/contracts/contract-addresses.json";
-    import * as sapphire from '@oasisprotocol/sapphire-paratime';
+    import { connectedToSapphire, fee, signerAddress, unwrappedMultiSend, unwrappedProvider } from '$lib/Stores';
 	import WalletConnection from '$lib/components/WalletConnection.svelte';
     import fsm from 'svelte-fsm'
 
@@ -79,24 +76,12 @@
     $: destinationsValid ? form.validate() : form.input();
     $: parseError ? form.error(parseError) : form.input();
 
-    async function getRoseBalance() {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        return await provider.getBalance($signerAddress);
-    }
+    const getRoseBalance = async () => $unwrappedProvider!.getBalance($signerAddress);
     
     const send = async () => {
-        //let wrapped = sapphire.wrap(window.ethereum);
-        let wrapped = window.ethereum;
-        const signer = await new ethers.BrowserProvider(wrapped).getSigner();
-        const multiSendContract = new ethers.Contract(
-                 ca.MultiSend,
-                 MultiSendArtifact.abi,
-                 signer
-            );
-
         const amountsBigInt = amounts.map(amount => ethers.parseEther(amount.toString()));
-        const fee = await multiSendContract.fee();
-        const receipt = await multiSendContract.multiSendRose(addresses, amountsBigInt, { value: total + fee });
+        const fee = await $unwrappedMultiSend!.fee();
+        const receipt = await $unwrappedMultiSend!.multiSendRose(addresses, amountsBigInt, { value: total + fee });
         await receipt.wait();
     }
 </script>
