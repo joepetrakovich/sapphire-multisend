@@ -8,7 +8,7 @@ async function main() {
   const MyToken = await ethers.getContractFactory("MyToken");
   const MultiSend = await ethers.getContractFactory("MultiSend");
   const myToken = await MyToken.deploy();
-  const initialFee = ethers.parseEther('10');
+  const initialFee = ethers.parseEther('2');
   const multiSend = await MultiSend.deploy(deployerAddress, initialFee);
   await myToken.waitForDeployment();
   await multiSend.waitForDeployment();

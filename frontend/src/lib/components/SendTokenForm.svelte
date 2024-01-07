@@ -8,6 +8,7 @@
     import ca from "$lib/contracts/contract-addresses.json";
 	import WalletConnection from '$lib/components/WalletConnection.svelte';
     import fsm from 'svelte-fsm'
+	import { sumDecimalsAsBigInt } from '$lib/Utils';
 
     let token: Token | undefined;
     let balance: bigint;
@@ -32,9 +33,8 @@
         },
         validating: {
             _enter() {
-                const totalAsNumberString = amounts.reduce((partialSum, a) => partialSum + a, 0).toString();
-                total = ethers.parseUnits(totalAsNumberString, token!.decimals);
-   
+                total = sumDecimalsAsBigInt(amounts, token!.decimals);
+
                 getTokenBalanceAndAllowance()
                     .then(ba => {
                     balance = ba.balance;

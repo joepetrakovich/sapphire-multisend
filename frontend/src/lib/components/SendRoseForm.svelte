@@ -4,6 +4,7 @@
     import { connectedToSapphire, fee, signerAddress, unwrappedMultiSend, unwrappedProvider } from '$lib/Stores';
 	import WalletConnection from '$lib/components/WalletConnection.svelte';
     import fsm from 'svelte-fsm'
+	import { sumDecimalsAsBigInt } from '$lib/Utils';
 
     let balance: bigint;
     let addresses: string[];
@@ -25,8 +26,7 @@
         },
         validating: {
             _enter() {
-                const totalAsNumberString = amounts.reduce((partialSum, a) => partialSum + a, 0).toString();
-                total = ethers.parseEther(totalAsNumberString);
+                total = sumDecimalsAsBigInt(amounts, 18);
                 
                 getRoseBalance()
                     .then((roseBalance) => {

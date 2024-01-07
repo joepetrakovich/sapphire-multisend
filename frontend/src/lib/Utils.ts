@@ -49,3 +49,11 @@ export default function formatEther(wei: bigint, precision: number = 2) {
 export function isNumber(value: any) {
   return typeof value === 'number' && isFinite(value);
 }
+
+export function sumDecimalsAsBigInt(values: number[], unit: number): bigint {
+  let total = 0n;
+  for (let i = 0; i < values.length; i++) {
+    total = total + ethers.parseUnits(values[i].toString(), unit);
+  }
+  return total;
+}
