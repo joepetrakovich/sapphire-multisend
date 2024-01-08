@@ -12,7 +12,13 @@ DONE - add example
 DONE - wrap all providers/signers..
 DONE - providers 
 DONE (holding off, seems jank, dont need encryption per say) - signers
-- summary view with errors/success on tacosender, 
+- pre-send summary view with (need that 9B util too?)
+- allowance needed view
+- success view
+- error view
+- hide state internals 
+- token/rose balance view (could be annoying with massive amounts, need that 9B util in rose derby)
+
 
 
 ## NEXT
