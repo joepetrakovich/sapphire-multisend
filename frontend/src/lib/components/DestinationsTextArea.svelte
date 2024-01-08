@@ -97,12 +97,3 @@
           {disabled} 
           placeholder="Enter a comma-separated address and amount on each line..." 
         />
-
-<style>
-    .invalid {
-        border:2px solid red;
-    }
-    .valid {
-        border:2px solid lightgreen;
-    }
-</style>

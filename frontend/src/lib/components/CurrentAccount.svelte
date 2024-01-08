@@ -7,7 +7,7 @@
 </script>
 
 <span title="Current Address: {$signerAddress}">
-    <Jazzicon address="{$signerAddress}" size={24} />
+    <Jazzicon address="{$signerAddress}" size={20} />
     {#if showAddress}
         {truncateWithCenterEllipses($signerAddress, 13)}
     {/if}

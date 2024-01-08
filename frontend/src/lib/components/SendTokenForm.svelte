@@ -146,7 +146,7 @@
             {#if $form === 'awaitingApproval' || $form === 'approving' }
                 <button on:click={form.approve} disabled={$form === 'approving'}>{$form === 'approving' ? 'Approving...' : 'Approve'}</button>
             {:else}
-                <button on:click={form.send} disabled={$form !== 'valid'}>{$form === 'sending' ? 'Sending...' : 'Send'}</button>
+                <button class="btn-primary" on:click={form.send} disabled={$form !== 'valid'}>{$form === 'sending' ? 'Sending...' : 'Send'}</button>
             {/if}
         {:else}
             <WalletConnection fullWidth={true} />

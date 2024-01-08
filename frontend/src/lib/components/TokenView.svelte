@@ -25,13 +25,15 @@
         align-items: center;
         gap: 0.4em;
         max-width: fit-content;
-        color: green;
         line-height: 0;
         padding: 0.14em;
-        border: 2px solid lightgreen;
         border-radius: 2px;
         font-family: monospace;
         font-weight: bold;
+        background-color: white;
+        color: var(--dark-spring-green);
+        border: 2px solid var(--celadon);
+        background-color: var(--celadon-light);
     }
     button {
         background: none;
