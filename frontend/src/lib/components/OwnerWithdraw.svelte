@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { unwrappedMultiSend, unwrappedProvider, signerAddress } from "$lib/Stores";
+	import { unwrappedMultiSend, provider, signerAddress } from "$lib/Stores";
 	import { ethers } from "ethers";
     import contractAddress from "$lib/contracts/contract-addresses.json";
 
@@ -7,7 +7,7 @@
     let balance: bigint;
 
     $: $unwrappedMultiSend?.owner().then(o => owner = o);
-    $: $unwrappedProvider?.getBalance(contractAddress.MultiSend).then(b => balance = b);
+    $: $provider?.getBalance(contractAddress.MultiSend).then(b => balance = b);
     $: isOwner = owner && $signerAddress && owner.toLowerCase() === $signerAddress.toLowerCase();
 
     let withdrawing: boolean;
@@ -19,7 +19,7 @@
             .then(receipt => {
                 return receipt.wait()
                 .then(() => {
-                    $unwrappedProvider
+                    $provider
                        ?.getBalance(contractAddress.MultiSend)
                         .then(b => balance = b);
                 })
