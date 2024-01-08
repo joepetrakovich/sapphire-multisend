@@ -1,7 +1,7 @@
 <script lang="ts">
     import DestinationsTextArea from '$lib/components/DestinationsTextArea.svelte';
     import { ethers } from 'ethers';
-    import { connectedToSapphire, fee, signerAddress, unwrappedMultiSend, unwrappedProvider } from '$lib/Stores';
+    import { connectedToSapphire, fee, signerAddress, unwrappedMultiSend, provider } from '$lib/Stores';
 	import WalletConnection from '$lib/components/WalletConnection.svelte';
     import fsm from 'svelte-fsm'
 	import { sumDecimalsAsBigInt } from '$lib/Utils';
@@ -76,7 +76,7 @@
     $: destinationsValid ? form.validate() : form.input();
     $: parseError ? form.error(parseError) : form.input();
 
-    const getRoseBalance = async () => $unwrappedProvider!.getBalance($signerAddress);
+    const getRoseBalance = async () => $provider!.getBalance($signerAddress);
     
     const send = async () => {
         const amountsBigInt = amounts.map(amount => ethers.parseEther(amount.toString()));

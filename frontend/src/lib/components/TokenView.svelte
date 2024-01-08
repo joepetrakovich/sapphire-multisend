@@ -27,10 +27,9 @@
         max-width: fit-content;
         line-height: 0;
         padding: 0.14em;
-        border-radius: 2px;
         font-family: monospace;
         font-weight: bold;
-        background-color: white;
+        border-radius: 4px;
         color: var(--dark-spring-green);
         border: 2px solid var(--celadon);
         background-color: var(--celadon-light);

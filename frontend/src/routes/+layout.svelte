@@ -49,7 +49,7 @@
         margin-left: 2px;
         color: white;
         display: inline-block;
-        line-height: 1.2em;
+        line-height: 1.24em;
     }
     nav span {
         display: none;

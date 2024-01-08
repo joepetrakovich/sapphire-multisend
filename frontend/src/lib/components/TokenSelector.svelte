@@ -5,6 +5,7 @@
     import fsm from 'svelte-fsm'
 	import TokenView from './TokenView.svelte';
 	import PendingSpinner from './PendingSpinner.svelte';
+	import { provider } from '$lib/Stores';
 
     export let disabled: boolean;
     export let token: Token | undefined;
@@ -58,7 +59,7 @@
         const tokenContract = new ethers.Contract(
             address,
             GenericERC20.abi,
-            new ethers.BrowserProvider(window.ethereum)
+            $provider
         );
 
         let name: string = await tokenContract.name();

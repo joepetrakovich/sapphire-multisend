@@ -3,7 +3,7 @@
     import TokenSelector from '$lib/components/TokenSelector.svelte';
     import { ethers } from 'ethers';
     import { type Token } from '$lib/Models';
-    import { connectedToSapphire, fee, signerAddress, unwrappedMultiSend, unwrappedProvider, unwrappedSigner } from '$lib/Stores';
+    import { connectedToSapphire, fee, signerAddress, unwrappedMultiSend, provider, unwrappedSigner } from '$lib/Stores';
     import GenericERC20 from "$lib/contracts/GenericERC20.json";
     import ca from "$lib/contracts/contract-addresses.json";
 	import WalletConnection from '$lib/components/WalletConnection.svelte';
@@ -109,9 +109,9 @@
         const contract = new ethers.Contract(
             token!.address,
             GenericERC20.abi,
-            $unwrappedProvider!);
+            $provider!);
 
-        const roseBalance = await $unwrappedProvider!.getBalance($signerAddress);
+        const roseBalance = await $provider!.getBalance($signerAddress);
         const balance = await contract.balanceOf($signerAddress);
         const allowance = await contract.allowance($signerAddress, ca.MultiSend);
         

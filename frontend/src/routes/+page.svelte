@@ -56,14 +56,9 @@
         cursor:default;
         box-shadow: inset 0px 0px 5px var(--color-taco-red);
         background-color: #ffa5a5;
-         /* box-shadow: inset 0px 0px 5px var(--celadon);
-        background-color: var(--celadon-light);
-        border-color: var(--celadon); */
-        
     }
     input[type=radio]:disabled+label {
         cursor:default;
-        /* box-shadow: inset 0px 0px 5px var(--color-taco-red); */
         background-color: unset;
         box-shadow: unset;
         opacity: 0.5;
