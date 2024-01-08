@@ -3,26 +3,12 @@
     import WalletConnection from "$lib/components/WalletConnection.svelte";
 	import FeeView from "$lib/components/FeeView.svelte";
 	import OwnerWithdraw from "$lib/components/OwnerWithdraw.svelte";
+    import Icon from "$lib/images/taco-icon.svg";
 </script>
 <nav>
    <div>
-        <svg
-            width="16.597019"
-            height="16.597092"
-            fill="#00008b"
-            class="bi bi-x-diamond-fill"
-            viewBox="0 0 16.597019 16.597092"
-            version="1.1"
-            id="svg1"
-            xmlns="http://www.w3.org/2000/svg">
-        <defs
-            id="defs1" />
-        <path
-            d="m 9.3480098,0.73308157 c -0.58,-0.58 -1.52,-0.58 -2.1,0 l -2.903,2.90400003 3.953,3.954 3.9540002,-3.954 -2.9050002,-2.90400003 z m 3.6100002,3.61100003 -3.9520002,3.954 3.9540002,3.9540004 2.904,-2.9050004 c 0.58,-0.58 0.58,-1.519 0,-2.098 l -2.904,-2.905 z m -0.706,8.6140004 -3.9540002,-3.9520004 -3.954,3.9540004 2.905,2.904 c 0.58,0.58 1.519,0.58 2.098,0 l 2.9050002,-2.904 z m -8.6140002,-0.706 3.952,-3.9540004 -3.953,-3.954 -2.90400005,2.905 c -0.58,0.58 -0.58,1.519 0,2.098 z"
-            id="path2"
-            style="fill:#467dcd;fill-opacity:1;stroke:none;stroke-width:0.60000002;stroke-dasharray:none;stroke-opacity:1" />
-        </svg>
-        Sapphire Multisend
+        <img src={Icon} alt="Taco logo">
+        <span>Taco<i>sender</i></span>
     </div>
    <WalletConnection showAddress={true} />
 </nav>
@@ -46,12 +32,33 @@
     nav {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         margin: 1em 0 2em 0;
     }
     nav div {
         display: flex;
         gap: 0.4em;
         align-items: center;
+    }
+    nav i {
+        font-style: unset;
+        margin: 0;
+        background-color: #ec4740;
+        border-radius: 6px;
+        padding: 0 4px;
+        margin-left: 2px;
+        color: white;
+        display: inline-block;
+        line-height: 1.2em;
+    }
+    nav span {
+        display: none;
+        font-family: var(--font-title);
+    }
+    @media (min-width: 342px) {
+        nav div span {
+            display: inline-block;
+        }
     }
     main {
         margin-bottom: 2em;

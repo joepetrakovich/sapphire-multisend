@@ -1,15 +1,22 @@
 
 ## TODAY
 ----------------
-DONE - refactor selectedAddress
-- testnet deploy
-- verify testnet contract
+DONE - icon, design cleanup
+DONE -- bigger icon
+DONE -- buttons instead of radios
+DONE -- better button colors
+DONE -- icon only below 360ish
+DONE -- better bg color, red is a little harsh right. hard to see green success state, hard to see token box
+
 
 ## NEXT
 ----------------
-- then a final cleanup with name, branding, 
+- can add a confirmation box "sending: x rose, 32 addresses.
+- verify testnet contract
+-- a way to switch to testnet/mainnet via config on netlify
+42px logo? mobile / pc
 - mainnet after testing
-- get guidance on ethers v6 and sapphire.wrap.
+- sapphire wrap everything.
   Currently using unwrapped providers because they don't seem to be
   doing anything either way and I don't have any view calls that use
   msg.sender. for now its testnet so nbd
@@ -18,7 +25,8 @@ DONE - refactor selectedAddress
 
 ## NOTES
 ---------------
-0xB643Ec25c66390d1A4A1130d44CE8C1286C05d0B
+0xB643Ec25c66390d1A4A1130d44CE8C1286C05d0B test
+0x8a63eCa54A38865396990387110136729bC2273c rosy
 
 0x68d3FCA25c214215699E82453630C07f1331EA9D,1.1
 0xa187beD9FFa27444758407b0E597449F6bAE6B55,0.333

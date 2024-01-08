@@ -91,7 +91,7 @@
         <DestinationsTextArea bind:addresses bind:amounts bind:valid={destinationsValid} bind:error={parseError} disabled={!$connectedToSapphire}/>
         
         {#if $connectedToSapphire}
-            <button on:click={form.send} disabled={$form !== 'valid'}>{$form === 'sending' ? 'Sending...' : 'Send'}</button> 
+            <button class="btn-primary" on:click={form.send} disabled={$form !== 'valid'}>{$form === 'sending' ? 'Sending...' : 'Send'}</button> 
         {:else}
             <WalletConnection fullWidth={true} />
         {/if}

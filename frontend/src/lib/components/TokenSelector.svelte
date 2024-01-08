@@ -93,11 +93,5 @@
     input {
         flex-grow: 1;
     }
-    .invalid {
-        border:2px solid red;
-    }
-    .valid {
-        border:2px solid lightgreen;
-    }
 </style>
 
