@@ -95,5 +95,5 @@
 <textarea rows="10" class={$state} 
           bind:value={text} on:blur={state.parse} on:input={state.input} 
           {disabled} 
-          placeholder="Enter a comma-separated address and amount on each line..." 
+          placeholder="Enter a comma-separated address and amount on each line (0x00, 1)..." 
         />
