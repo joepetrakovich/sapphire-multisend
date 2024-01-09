@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
 
 export function truncateWithCenterEllipses(str: string, maxLength: number) {
@@ -50,10 +51,7 @@ export function isNumber(value: any) {
   return typeof value === 'number' && isFinite(value);
 }
 
-export function sumDecimalsAsBigInt(values: number[], unit: number): bigint {
-  let total = 0n;
-  for (let i = 0; i < values.length; i++) {
-    total = total + ethers.parseUnits(values[i].toString(), unit);
-  }
-  return total;
+export function sumDecimalsAsBigInt(values: BigNumber[], unit: number): bigint {
+  const intermediate = values.reduce((partialSum, a) => partialSum.plus(a), new BigNumber(0));
+  return ethers.parseUnits(intermediate.toFixed(), unit);
 }

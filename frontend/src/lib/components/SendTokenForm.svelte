@@ -9,12 +9,14 @@
 	import WalletConnection from '$lib/components/WalletConnection.svelte';
     import fsm from 'svelte-fsm'
 	import { sumDecimalsAsBigInt } from '$lib/Utils';
+	import SendSummary from './SendSummary.svelte';
+	import type BigNumber from 'bignumber.js';
 
     let token: Token | undefined;
     let balance: bigint;
     let allowance: bigint;
     let addresses: string[];
-    let amounts: number[];
+    let amounts: BigNumber[];
     let total: bigint;
     let tokenValid: boolean, destinationsValid: boolean;
     let error: string | undefined;
@@ -33,7 +35,12 @@
         },
         validating: {
             _enter() {
-                total = sumDecimalsAsBigInt(amounts, token!.decimals);
+                try {
+                    total = sumDecimalsAsBigInt(amounts, token!.decimals);
+                } catch (e) {
+                    this.error(e);
+                    return;
+                }
 
                 getTokenBalanceAndAllowance()
                     .then(ba => {
@@ -130,7 +137,7 @@
     }
 
     const send = async () => {
-        const amountsBigInt = amounts.map(amount => ethers.parseUnits(amount.toString(), token!.decimals));
+        const amountsBigInt = amounts.map(amount => ethers.parseUnits(amount.toFixed(), token!.decimals));
         const fee = await $unwrappedMultiSend!.fee();
         const receipt = await $unwrappedMultiSend!.multiSendToken(token!.address, addresses, amountsBigInt, { value: fee });
         await receipt.wait();

@@ -1,38 +1,33 @@
 
 ## TODAY
 ----------------
-DONE - icon, design cleanup
-DONE -- bigger icon
-DONE -- buttons instead of radios
-DONE -- better button colors
-DONE -- icon only below 360ish
-DONE -- better bg color, red is a little harsh right. hard to see green success state, hard to see token box
-DONE (disabled state)- fix click on mobile
-DONE - add example
-DONE - wrap all providers/signers..
-DONE - providers 
-DONE (holding off, seems jank, dont need encryption per say) - signers
+DONE - fix decimal overflow breaking page
+
+- token/rose balance view (could be annoying with massive amounts, need that 9B util in rose derby)
+-- can be reminiscent of metamask's token amount display. is there an alg
+-- this is a pain because of ellipses
+
 - pre-send summary view with (need that 9B util too?)
+-- theoretically could put in button text but maybe we want more room
+
 - allowance needed view
 - success view
 - error view
 - hide state internals 
-- token/rose balance view (could be annoying with massive amounts, need that 9B util in rose derby)
 
+- error message when sending rose doesnt specify "to cover rose fee"
 
 
 ## NEXT
 ----------------
-- can add a confirmation box "sending: x rose, 32 addresses.
 - verify testnet contract
 -- a way to switch to testnet/mainnet via config on netlify
 42px logo? mobile / pc
 - mainnet after testing
-- sapphire wrap everything.
   Currently using unwrapped providers because they don't seem to be
   doing anything either way and I don't have any view calls that use
   msg.sender. for now its testnet so nbd
-- error message when sending rose doesnt specify "rose fee"
+
 
 
 ## NOTES

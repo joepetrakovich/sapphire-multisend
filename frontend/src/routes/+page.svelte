@@ -47,7 +47,7 @@
     }
     label {
         background-color: white;
-        border-radius: 4px;
+        border-radius: var(--container-border-radius);
         padding: 0 4px;
         border: 1px solid black;
         cursor: pointer;

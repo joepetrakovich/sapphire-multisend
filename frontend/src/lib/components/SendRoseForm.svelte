@@ -5,10 +5,12 @@
 	import WalletConnection from '$lib/components/WalletConnection.svelte';
     import fsm from 'svelte-fsm'
 	import { sumDecimalsAsBigInt } from '$lib/Utils';
+	import SendSummary from './SendSummary.svelte';
+	import type BigNumber from 'bignumber.js';
 
     let balance: bigint;
     let addresses: string[];
-    let amounts: number[];
+    let amounts: BigNumber[];
     let total: bigint;
     let destinationsValid: boolean;
     let error: string | undefined;
@@ -26,7 +28,12 @@
         },
         validating: {
             _enter() {
-                total = sumDecimalsAsBigInt(amounts, 18);
+                try {
+                    total = sumDecimalsAsBigInt(amounts, 18);
+                } catch (e) {
+                    this.error(e);
+                    return;
+                }
                 
                 getRoseBalance()
                     .then((roseBalance) => {
@@ -79,7 +86,7 @@
     const getRoseBalance = async () => $provider!.getBalance($signerAddress);
     
     const send = async () => {
-        const amountsBigInt = amounts.map(amount => ethers.parseEther(amount.toString()));
+        const amountsBigInt = amounts.map(amount => ethers.parseEther(amount.toFixed()));
         const fee = await $unwrappedMultiSend!.fee();
         const receipt = await $unwrappedMultiSend!.multiSendRose(addresses, amountsBigInt, { value: total + fee });
         await receipt.wait();
