@@ -2,10 +2,11 @@
     import { ethers } from 'ethers';
     import Papa from 'papaparse';
     import fsm from 'svelte-fsm'
+    import BigNumber from 'bignumber.js';
 
     export let disabled: boolean; 
     export let addresses: string[];
-    export let amounts: number[];
+    export let amounts: BigNumber[];
     export let valid: boolean;
     export let error: string | undefined;
 
@@ -60,24 +61,25 @@
         }
 
         if (results.data.length != 2) {
-            state.error(`line ${lineNum} is not formatted properly.`);
+            state.error(`Line ${lineNum} is not formatted properly.`);
             parser.abort();
             return;
         }
 
         if (!ethers.isAddress(results.data[0])) {
-            state.error(`line ${lineNum} is not a valid address.`);
+            state.error(`Line ${lineNum} is not a valid address.`);
             parser.abort();
             return;
         }
         const address = results.data[0];
 
-        const amount = Number(results.data[1]);
-        if (Number.isNaN(amount) || amount <= 0) {
-            state.error(`line ${lineNum} amount must be a number greater than 0.`);
+        const amount = BigNumber(results.data[1]);
+        if (amount.isNaN() || amount.isLessThanOrEqualTo(0)) {
+            state.error(`Line ${lineNum} amount must be a number greater than 0.`);
             parser.abort();
             return;
         }
+        
 
         addresses = [...addresses, address];
         amounts = [...amounts, amount];
@@ -97,3 +99,9 @@
           {disabled} 
           placeholder="Enter an address and amount (0x00,1) on each line..." 
         />
+
+<style>
+    textarea {
+        resize: vertical;
+    }
+</style>

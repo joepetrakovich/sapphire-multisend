@@ -3,7 +3,8 @@ export interface Token {
     name: string,
     symbol: string,
     decimals: number,
-    address: string
+    address: string,
+    balance: bigint
 }
 
 export interface Currency {

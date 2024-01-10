@@ -61,7 +61,7 @@
         }
     }
     main {
-        margin-bottom: 2em;
+        margin-bottom: 3em;
     }
     footer {
         display: flex;

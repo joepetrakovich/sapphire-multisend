@@ -8,13 +8,16 @@
     import ca from "$lib/contracts/contract-addresses.json";
 	import WalletConnection from '$lib/components/WalletConnection.svelte';
     import fsm from 'svelte-fsm'
-	import { sumDecimalsAsBigInt } from '$lib/Utils';
+	import { focus, sumDecimalsAsBigInt } from '$lib/Utils';
+	import SendSummary from './SendSummary.svelte';
+	import type BigNumber from 'bignumber.js';
+	import Flasher from './Flasher.svelte';
 
     let token: Token | undefined;
     let balance: bigint;
     let allowance: bigint;
     let addresses: string[];
-    let amounts: number[];
+    let amounts: BigNumber[];
     let total: bigint;
     let tokenValid: boolean, destinationsValid: boolean;
     let error: string | undefined;
@@ -33,7 +36,12 @@
         },
         validating: {
             _enter() {
-                total = sumDecimalsAsBigInt(amounts, token!.decimals);
+                try {
+                    total = sumDecimalsAsBigInt(amounts, token!.decimals);
+                } catch (e) {
+                    this.error(e);
+                    return;
+                }
 
                 getTokenBalanceAndAllowance()
                     .then(ba => {
@@ -100,7 +108,6 @@
         }
     });
 
-    $: $signerAddress && form.input();
     $: tokenValid && destinationsValid ? form.validate() : form.input();
     $: parseError ? form.error(parseError) : form.input();
     $: tokenError ? form.error(tokenError) : form.input();
@@ -130,7 +137,7 @@
     }
 
     const send = async () => {
-        const amountsBigInt = amounts.map(amount => ethers.parseUnits(amount.toString(), token!.decimals));
+        const amountsBigInt = amounts.map(amount => ethers.parseUnits(amount.toFixed(), token!.decimals));
         const fee = await $unwrappedMultiSend!.fee();
         const receipt = await $unwrappedMultiSend!.multiSendToken(token!.address, addresses, amountsBigInt, { value: fee });
         await receipt.wait();
@@ -141,48 +148,38 @@
     <form>
         <TokenSelector bind:token bind:valid={tokenValid} bind:error={tokenError} disabled={!$connectedToSapphire} /> 
         <DestinationsTextArea bind:addresses bind:amounts bind:valid={destinationsValid} bind:error={parseError} disabled={!$connectedToSapphire}/>
-        
-        {#if $connectedToSapphire}
-            {#if $form === 'awaitingApproval' || $form === 'approving' }
-                <button on:click={form.approve} disabled={$form === 'approving'}>{$form === 'approving' ? 'Approving...' : 'Approve'}</button>
-            {:else}
-                <button class="btn-primary" on:click={form.send} disabled={$form !== 'valid'}>{$form === 'sending' ? 'Sending...' : 'Send'}</button>
-            {/if}
-        {:else}
+
+        {#if !$connectedToSapphire}
             <WalletConnection fullWidth={true} />
+        {:else if $form !== 'entering' && $form !== 'invalid' && token}
+            <SendSummary symbol={token.symbol} unit={token.decimals} {addresses} {total} success={$form === 'complete'}>
+                <svelte:fragment slot="message">
+                    {#if $form === 'sending'}<Flasher />Sending {token.symbol}...{:else if $form === 'approving'}<Flasher />Approving token allowance...{:else}Everything look good?{/if}
+                </svelte:fragment>
+                {#if $form === 'awaitingApproval'}
+                    <button on:click={form.approve} use:focus>Approve</button>
+                {:else if $form === 'valid'}
+                    <button class="btn-primary" on:click={form.send} use:focus>Send</button>
+                {:else if $form === 'approving' || $form === 'sending'}
+                    <button disabled>{$form === 'approving' ? 'Approving...' : 'Sending...'}</button>
+                {/if}
+            </SendSummary>
         {/if}
     </form>
-
-    <details class={$form}>
-        <summary>
-            state internals {#if error}(error: {error}){/if}
-            {#if $form === 'complete'}(multisend complete){/if}
-        </summary>
-        <span>token valid: {tokenValid}</span>
-        <span>destinations valid: {destinationsValid}</span>
-        <span>form state: {$form}</span>
-        <span>token: {token?.name || ''}</span>
-        <span>balance: {ethers.formatUnits(balance, token?.decimals)}</span>
-        <span>allowance: {ethers.formatUnits(allowance, token?.decimals)}</span>
-        <span>total to send: {ethers.formatUnits(total, token?.decimals)}</span>
-        <span>error: {error}</span>
-    </details>
+    {#if error}<span>{error}</span>{/if}
 </div>
 
 <style>
-    div, form, details {
+    div, form {
         display: flex;
         flex-direction: column;
         gap: 0.2em;
     }
-    details {
+    span {
         font-style: italic;
-        color: gray;
-    }
-    details.invalid {
         color: red;
     }
-    details.complete {
-        color: green;
+    button:focus {
+        border: 2px solid black;
     }
 </style>

@@ -5,10 +5,10 @@
     import fsm from 'svelte-fsm'
 	import TokenView from './TokenView.svelte';
 	import PendingSpinner from './PendingSpinner.svelte';
-	import { provider } from '$lib/Stores';
+	import { provider, signerAddress } from '$lib/Stores';
 
-    export let disabled: boolean;
     export let token: Token | undefined;
+    export let disabled: boolean;
     export let valid: boolean;
     export let error: string | undefined;
 
@@ -53,7 +53,7 @@
 
     const getTokenDetails = async () => {
         if (!ethers.isAddress(address)) {
-            throw new Error('not an address');
+            throw new Error('Not a valid token address');
         }
 
         const tokenContract = new ethers.Contract(
@@ -62,11 +62,12 @@
             $provider
         );
 
-        let name: string = await tokenContract.name();
-        let symbol: string = await tokenContract.symbol();
-        let decimals: number = await tokenContract.decimals();       
+        const name: string = await tokenContract.name(),
+        symbol: string = await tokenContract.symbol(),
+        decimals: number = await tokenContract.decimals(),
+        balance: bigint = await tokenContract.balanceOf($signerAddress);
         
-        return { name, symbol, decimals, address }; 
+        return { name, symbol, decimals, address, balance }; 
     }
 
     const clear = () => {
@@ -81,7 +82,7 @@
     <input type="text" class={$state} bind:value={address} on:change={state.change} on:input={state.input} {disabled} placeholder="Enter a token address..." />
     <PendingSpinner message="" {tx} />
     {#if token}
-        <TokenView name={token.name} symbol={token.symbol} on:clear={clear} />
+        <TokenView {token} on:clear={clear} />
     {/if}
 </div>
 

@@ -1,38 +1,34 @@
 
 ## TODAY
 ----------------
-DONE - icon, design cleanup
-DONE -- bigger icon
-DONE -- buttons instead of radios
-DONE -- better button colors
-DONE -- icon only below 360ish
-DONE -- better bg color, red is a little harsh right. hard to see green success state, hard to see token box
-DONE (disabled state)- fix click on mobile
-DONE - add example
-DONE - wrap all providers/signers..
-DONE - providers 
-DONE (holding off, seems jank, dont need encryption per say) - signers
-- pre-send summary view with (need that 9B util too?)
-- allowance needed view
-- success view
-- error view
-- hide state internals 
-- token/rose balance view (could be annoying with massive amounts, need that 9B util in rose derby)
-
-
+DONE - pre-send summary view with (need that 9B util too?)
+DONE - success view
+DONE - fix tab off. should prob focus into send/approve button.
+DONE - add pulse somewhere during sending/approving
+DONE - fix change account loses total, should it just clear? providers and stuff should reset
+DONE (but could handle reject erorrs better) - error view
+DONE - hide state internals 
+- push
 
 ## NEXT
 ----------------
-- can add a confirmation box "sending: x rose, 32 addresses.
+- token/rose balance view (could be annoying with massive amounts, need that 9B util in rose derby? that only worked with ether tho.. look for library
+-- can be reminiscent of metamask's token amount display. is there an alg
+-- this is a pain because of ellipses, can just be truncated..
+- user rejected error better handling.
+- a better coloring for those radios.
+- error message when sending rose doesnt specify "to cover rose fee"
+
+- future refactor it so that a signer change can trigger a reset recalc from top down, so values stay but balances and allowances recalc.
+- also could have textarea red if not enough balance errors
+
 - verify testnet contract
 -- a way to switch to testnet/mainnet via config on netlify
 42px logo? mobile / pc
 - mainnet after testing
-- sapphire wrap everything.
   Currently using unwrapped providers because they don't seem to be
   doing anything either way and I don't have any view calls that use
   msg.sender. for now its testnet so nbd
-- error message when sending rose doesnt specify "rose fee"
 
 
 ## NOTES

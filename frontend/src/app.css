@@ -4,7 +4,9 @@
 
     --lavender-brush: #F8E9E9;
     --vermilion: #ec4740ff;
+    --lighter-blue: #D0E8FF;
     --light-sky-blue: #96cdffff;
+    --prussian-blue: #002642;
     --celadon: #a7e8bdff;
     --celadon-light: rgb(228 255 237);
     --dark-spring-green: #0c7c59ff;
@@ -17,6 +19,11 @@
     --space-2: 8px;
     --space-3: 16px;
     --space-4: 32px;
+
+    --container-border-radius: 4px;
+
+    --border-success: 2px solid var(--celadon);
+    --background-color-success: var(--celadon-light);
 
     --button-padding: var(--space-1) var(--space-2);
     --button-radius: var(--space-1);
@@ -55,7 +62,7 @@ body {
 button:not([disabled]).btn-primary {
     background-color: #ff645e;
     color: white;
-    border-radius: 4px;
+    border-radius: var(--container-border-radius);
     border: 1px solid black;
     height:1.8em;
     cursor: pointer;
@@ -64,11 +71,14 @@ button:not([disabled]).btn-primary {
 button:not([disabled]).btn-primary:hover {
     filter: brightness(120%);
 }
-button:not([disabled]).btn-primary:focus {
+button:focus {
+    border: 2px solid black;
+}
+button:not([disabled]).btn-primary:active {
     filter:brightness(80%);
 }
 textarea, input[type="text"] {
-    border-radius: 4px;
+    border-radius: var(--container-border-radius);
 }
 input[type="text"].invalid,
 textarea.invalid {
@@ -76,7 +86,9 @@ textarea.invalid {
 }
 input[type="text"].valid,
 textarea.valid  {
-    border:2px solid var(--dark-spring-green);
-    border: 2px solid var(--celadon);
-    background-color: var(--celadon-light);
+    border: var(--border-success);
+    background-color: var(--background-color-success);
+}
+.flashing {
+    animation: flash-mid linear 1.25s infinite;
 }

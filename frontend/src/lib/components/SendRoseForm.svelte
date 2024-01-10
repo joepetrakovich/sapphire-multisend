@@ -4,11 +4,14 @@
     import { connectedToSapphire, fee, signerAddress, unwrappedMultiSend, provider } from '$lib/Stores';
 	import WalletConnection from '$lib/components/WalletConnection.svelte';
     import fsm from 'svelte-fsm'
-	import { sumDecimalsAsBigInt } from '$lib/Utils';
+	import { focus, sumDecimalsAsBigInt } from '$lib/Utils';
+	import SendSummary from './SendSummary.svelte';
+	import type BigNumber from 'bignumber.js';
+	import Flasher from './Flasher.svelte';
 
     let balance: bigint;
     let addresses: string[];
-    let amounts: number[];
+    let amounts: BigNumber[];
     let total: bigint;
     let destinationsValid: boolean;
     let error: string | undefined;
@@ -26,17 +29,24 @@
         },
         validating: {
             _enter() {
-                total = sumDecimalsAsBigInt(amounts, 18);
+                try {
+                    total = sumDecimalsAsBigInt(amounts, 18);
+                } catch (e) {
+                    this.error(e);
+                    return;
+                }
                 
                 getRoseBalance()
                     .then((roseBalance) => {
-                    balance = roseBalance;
-                    if (balance >= total + $fee) {
-                        this.success();
-                    } else {
-                        this.error('Insufficient Rose balance');
-                    }
-                    })
+                        balance = roseBalance;
+                        if (balance >= total + $fee) {
+                            this.success();
+                        } else if (balance >= total) {
+                            this.error('Insufficient Rose balance to pay fee');
+                        } else {
+                            this.error('Insufficient Rose balance');
+                        }
+                        })
                     .catch(this.error);
                 
             },
@@ -72,14 +82,13 @@
         }
     });
 
-    $: $signerAddress && form.input();
     $: destinationsValid ? form.validate() : form.input();
     $: parseError ? form.error(parseError) : form.input();
 
     const getRoseBalance = async () => $provider!.getBalance($signerAddress);
     
     const send = async () => {
-        const amountsBigInt = amounts.map(amount => ethers.parseEther(amount.toString()));
+        const amountsBigInt = amounts.map(amount => ethers.parseEther(amount.toFixed()));
         const fee = await $unwrappedMultiSend!.fee();
         const receipt = await $unwrappedMultiSend!.multiSendRose(addresses, amountsBigInt, { value: total + fee });
         await receipt.wait();
@@ -90,41 +99,32 @@
     <form>        
         <DestinationsTextArea bind:addresses bind:amounts bind:valid={destinationsValid} bind:error={parseError} disabled={!$connectedToSapphire}/>
         
-        {#if $connectedToSapphire}
-            <button class="btn-primary" on:click={form.send} disabled={$form !== 'valid'}>{$form === 'sending' ? 'Sending...' : 'Send'}</button> 
-        {:else}
+        {#if !$connectedToSapphire}
             <WalletConnection fullWidth={true} />
+        {:else if $form !== 'entering' && $form !== 'invalid'}
+            <SendSummary symbol="ROSE" unit={18} {addresses} {total} success={$form === 'complete'}>
+                <svelte:fragment slot="message">
+                    {#if $form === 'sending'}<Flasher />Sending Rose...{:else}Everything look good?{/if}
+                </svelte:fragment>
+                {#if $form === 'valid'}
+                    <button class="btn-primary" on:click={form.send} use:focus>Send</button>
+                {:else if $form === 'sending'}
+                    <button disabled>Sending...</button>
+                {/if}
+            </SendSummary>
         {/if}
     </form>
-  
-    <details class={$form}>
-        <summary>
-            state internals 
-            {#if error}(error: {error}){/if}
-            {#if $form === 'complete'}(multisend complete){/if}
-        </summary>
-        <span>destinations valid: {destinationsValid}</span>
-        <span>form state: {$form}</span>
-        <span>balance: {ethers.formatEther(balance)}</span>
-        <span>total to send: {ethers.formatEther(total)}</span>
-        <span>error: {error}</span>
-    </details>
+    {#if error}<span>{error}</span>{/if}
 </div>
 
 <style>
-    div, form, details {
+    div, form {
         display: flex;
         flex-direction: column;
         gap: 0.2em;
     }
-    details {
+    span {
         font-style: italic;
-        color: gray;
-    }
-    details.invalid {
         color: red;
-    }
-    details.complete {
-        color: green;
     }
 </style>
