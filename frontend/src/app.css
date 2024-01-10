@@ -4,7 +4,9 @@
 
     --lavender-brush: #F8E9E9;
     --vermilion: #ec4740ff;
+    --lighter-blue: #D0E8FF;
     --light-sky-blue: #96cdffff;
+    --prussian-blue: #002642;
     --celadon: #a7e8bdff;
     --celadon-light: rgb(228 255 237);
     --dark-spring-green: #0c7c59ff;
@@ -69,7 +71,10 @@ button:not([disabled]).btn-primary {
 button:not([disabled]).btn-primary:hover {
     filter: brightness(120%);
 }
-button:not([disabled]).btn-primary:focus {
+button:focus {
+    border: 2px solid black;
+}
+button:not([disabled]).btn-primary:active {
     filter:brightness(80%);
 }
 textarea, input[type="text"] {
@@ -83,4 +88,7 @@ input[type="text"].valid,
 textarea.valid  {
     border: var(--border-success);
     background-color: var(--background-color-success);
+}
+.flashing {
+    animation: flash-mid linear 1.25s infinite;
 }

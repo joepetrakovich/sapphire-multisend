@@ -55,3 +55,7 @@ export function sumDecimalsAsBigInt(values: BigNumber[], unit: number): bigint {
   const intermediate = values.reduce((partialSum, a) => partialSum.plus(a), new BigNumber(0));
   return ethers.parseUnits(intermediate.toFixed(), unit);
 }
+
+export function focus(el: HTMLElement){
+  el.focus();
+}

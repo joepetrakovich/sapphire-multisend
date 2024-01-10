@@ -53,7 +53,7 @@
 
     const getTokenDetails = async () => {
         if (!ethers.isAddress(address)) {
-            throw new Error('not an address');
+            throw new Error('Not a valid token address');
         }
 
         const tokenContract = new ethers.Contract(

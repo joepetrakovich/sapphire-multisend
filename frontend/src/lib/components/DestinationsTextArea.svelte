@@ -61,13 +61,13 @@
         }
 
         if (results.data.length != 2) {
-            state.error(`line ${lineNum} is not formatted properly.`);
+            state.error(`Line ${lineNum} is not formatted properly.`);
             parser.abort();
             return;
         }
 
         if (!ethers.isAddress(results.data[0])) {
-            state.error(`line ${lineNum} is not a valid address.`);
+            state.error(`Line ${lineNum} is not a valid address.`);
             parser.abort();
             return;
         }
@@ -75,7 +75,7 @@
 
         const amount = BigNumber(results.data[1]);
         if (amount.isNaN() || amount.isLessThanOrEqualTo(0)) {
-            state.error(`line ${lineNum} amount must be a number greater than 0.`);
+            state.error(`Line ${lineNum} amount must be a number greater than 0.`);
             parser.abort();
             return;
         }

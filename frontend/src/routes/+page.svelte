@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { connectedToSapphire } from '$lib/Stores';
+    import { connectedToSapphire, signerAddress } from '$lib/Stores';
     import OasisLogo from '$lib/images/oasis-logo-120px.png';
 	import SendTokenForm from '$lib/components/SendTokenForm.svelte';
     import SendRoseForm from '$lib/components/SendRoseForm.svelte';
@@ -10,23 +10,25 @@
 
 <div>
     <div>
-        <span>What are you sending?</span>
+        <span>Send:</span>
         <input type="radio" value={SendType.ERC20Token} bind:group disabled={!$connectedToSapphire} id="token" /><label for="token">Tokens</label>
         <input type="radio" value={SendType.Rose} bind:group disabled={!$connectedToSapphire} id="rose" /><label for="rose"><img src={OasisLogo} alt="Oasis Logo" width="16" />Rose</label>
     </div>
 
-    {#if group === SendType.Rose}
-        <SendRoseForm />
-    {:else}
-        <SendTokenForm />
-    {/if}
+    {#key $signerAddress}
+        {#if group === SendType.Rose}
+            <SendRoseForm />
+        {:else}
+            <SendTokenForm />
+        {/if}
+    {/key}
 </div>
 
 <style>
     div {
         display: flex;
         flex-direction: column;
-        gap: 0.4em;
+        gap: 0.2em;
     }
     div > div, label {
         display: flex;
@@ -35,7 +37,7 @@
         gap: 0.2em;
     }
     div > div {
-        gap: 0.8em;
+        gap: 0.2em;
     }
     span {
         text-wrap: nowrap;
@@ -51,6 +53,7 @@
         padding: 0 4px;
         border: 1px solid black;
         cursor: pointer;
+        line-height: 1.2em;
     }
     input[type=radio]:checked+label {
         cursor:default;
