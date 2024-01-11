@@ -1,14 +1,13 @@
-import { OasisNetworkStatus } from "./Models";
-import { getOasisNetworkConnectionStatus } from "./Network";
+import { NetworkStatus } from "./Models";
+import { TACOSENDER_CONTRACT_ADDRESS, DESIRED_NETWORK, getNetworkConnectionStatus } from "./Network";
 import { readable, derived, type Readable } from "svelte/store";
 import { ethers } from "ethers";
 import * as sapphire from '@oasisprotocol/sapphire-paratime';
 import MultiSendArtifact from "$lib/contracts/MultiSend.json";
-import contractAddress from "$lib/contracts/contract-addresses.json";
 
-export const oasisNetworkStatus = readable<OasisNetworkStatus>(OasisNetworkStatus.INITIALIZING, set => {
+export const networkStatus = readable<NetworkStatus>(NetworkStatus.INITIALIZING, set => {
     const interval = setInterval(async () => {
-        const status = await getOasisNetworkConnectionStatus();
+        const status = await getNetworkConnectionStatus(DESIRED_NETWORK.chainIdDecimal);
         set(status);
     }, 1000);
 
@@ -30,13 +29,13 @@ export const signerAddress = readable<string>('', set => {
     }
 });
 
-export const connectedToSapphire: Readable<boolean> = derived(oasisNetworkStatus, ($oasisNetworkStatus) => $oasisNetworkStatus === OasisNetworkStatus.ON_SAPPHIRE_PARATIME);
+export const connected: Readable<boolean> = derived(networkStatus, ($oasisNetworkStatus) => $oasisNetworkStatus === NetworkStatus.ON_DESIRED_NETWORK);
 
-export const provider: Readable<ethers.BrowserProvider|undefined> = derived([connectedToSapphire, signerAddress], ([$connected], set) => {
+export const provider: Readable<ethers.BrowserProvider|undefined> = derived([connected, signerAddress], ([$connected], set) => {
     $connected ? set(sapphire.wrap(new ethers.BrowserProvider(window.ethereum))) : set(undefined);
 });
 
-export const unwrappedProvider: Readable<ethers.BrowserProvider|undefined> = derived([connectedToSapphire, signerAddress], ([$connected], set) => {
+export const unwrappedProvider: Readable<ethers.BrowserProvider|undefined> = derived([connected, signerAddress], ([$connected], set) => {
     $connected ? set(new ethers.BrowserProvider(window.ethereum)) : set(undefined);
 });
 
@@ -51,7 +50,7 @@ export const unwrappedSigner: Readable<ethers.JsonRpcSigner|undefined> = derived
 export const multiSend: Readable<ethers.Contract|undefined> = derived(signer, ($signer, set) => {
     if ($signer) {
         set(new ethers.Contract(
-            contractAddress.MultiSend,
+            TACOSENDER_CONTRACT_ADDRESS,
             MultiSendArtifact.abi,
             $signer
         ))
@@ -63,7 +62,7 @@ export const multiSend: Readable<ethers.Contract|undefined> = derived(signer, ($
 export const unwrappedMultiSend: Readable<ethers.Contract|undefined> = derived(unwrappedSigner, ($unwrappedSigner, set) => {
     if ($unwrappedSigner) {
         set(new ethers.Contract(
-            contractAddress.MultiSend,
+            TACOSENDER_CONTRACT_ADDRESS,
             MultiSendArtifact.abi,
             $unwrappedSigner
         ))

@@ -1,3 +1,7 @@
 [build]
-	command = "npm run build"
+	command = "npm run build:mainnet"
+	publish = "build"
+
+[context.develop]
+	command = "npm run build:testnet"
 	publish = "build"

@@ -4,6 +4,9 @@
 	import FeeView from "$lib/components/FeeView.svelte";
 	import OwnerWithdraw from "$lib/components/OwnerWithdraw.svelte";
     import Icon from "$lib/images/taco-icon.svg";
+    import GithubLogo from "$lib/images/github-logo.svg";
+    import ConeIcon from "$lib/images/cone-icon.svg";
+    const { MODE } = import.meta.env;
 </script>
 <nav>
    <div>
@@ -21,11 +24,22 @@
     <div>
         <FeeView />
         <div>
-            <a href="https://github.com/joepetrakovich/oasis-multisend" target="_blank">Github</a>
-            <a href="https://faucet.testnet.oasis.dev/" target="_blank">Testnet Faucet</a>
+            <a href="https://github.com/joepetrakovich/oasis-multisend" target="_blank">
+                <img src={GithubLogo} alt="Github Logo">
+            </a>
+            {#if MODE === 'testnet' || MODE === 'hardhat'}
+                <img src={ConeIcon} alt="Cone Icon" title="{MODE}">
+            {/if}
+
+            {#if MODE === 'testnet'}
+                <a href="https://faucet.testnet.oasis.dev/" target="_blank">Testnet Faucet</a>
+            {/if}
         </div>
     </div>
-    <OwnerWithdraw />
+    <div>
+        <OwnerWithdraw />
+        <p>&copy; 2024 Tacosender. All rights reserved.</p>
+    </div>
 </footer>
 
 <style>
@@ -66,7 +80,7 @@
     footer {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 0.8em;
     }
     footer > div {
         display: flex;
@@ -78,10 +92,27 @@
     }
     footer > div > div {
         display: flex;
-        gap: 8px;
+        gap: 0.4em;
         align-items: center;
     }
     footer a:link, footer a:visited {
         color: gray;
+    }
+    footer a:focus {
+        outline: none;
+    }
+    footer > div:nth-child(2) {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    footer p {
+        font-size: 1em;
+        opacity:0.4;
+        padding:0;
+        margin:0;
+    }
+    footer img {
+        vertical-align: sub;;
     }
 </style>

@@ -1,7 +1,7 @@
 <script lang="ts">
     import DestinationsTextArea from '$lib/components/DestinationsTextArea.svelte';
     import { ethers } from 'ethers';
-    import { connectedToSapphire, fee, signerAddress, unwrappedMultiSend, provider } from '$lib/Stores';
+    import { connected, fee, signerAddress, unwrappedMultiSend, provider } from '$lib/Stores';
 	import WalletConnection from '$lib/components/WalletConnection.svelte';
     import fsm from 'svelte-fsm'
 	import { focus, sumDecimalsAsBigInt } from '$lib/Utils';
@@ -97,9 +97,9 @@
 
 <div>
     <form>        
-        <DestinationsTextArea bind:addresses bind:amounts bind:valid={destinationsValid} bind:error={parseError} disabled={!$connectedToSapphire}/>
+        <DestinationsTextArea bind:addresses bind:amounts bind:valid={destinationsValid} bind:error={parseError} disabled={!$connected}/>
         
-        {#if !$connectedToSapphire}
+        {#if !$connected}
             <WalletConnection fullWidth={true} />
         {:else if $form !== 'entering' && $form !== 'invalid'}
             <SendSummary symbol="ROSE" unit={18} {addresses} {total} success={$form === 'complete'}>

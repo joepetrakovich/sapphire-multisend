@@ -6,11 +6,11 @@ async function main() {
   const [deployer] = await ethers.getSigners();
 
   const multiSendContract = new ethers.Contract(
-    ca.MultiSend,
+    ca.MultiSendMainnet,
     artifact.abi,
     deployer);
     
-    await multiSendContract.setFee(ethers.parseEther('2'));
+    await multiSendContract.setFee(ethers.parseEther('5'));
 }
 
 main().catch((error) => {

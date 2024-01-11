@@ -3,15 +3,15 @@
     import TokenSelector from '$lib/components/TokenSelector.svelte';
     import { ethers } from 'ethers';
     import { type Token } from '$lib/Models';
-    import { connectedToSapphire, fee, signerAddress, unwrappedMultiSend, provider, unwrappedSigner } from '$lib/Stores';
+    import { fee, signerAddress, unwrappedMultiSend, provider, unwrappedSigner, connected } from '$lib/Stores';
     import GenericERC20 from "$lib/contracts/GenericERC20.json";
-    import ca from "$lib/contracts/contract-addresses.json";
 	import WalletConnection from '$lib/components/WalletConnection.svelte';
     import fsm from 'svelte-fsm'
 	import { focus, sumDecimalsAsBigInt } from '$lib/Utils';
 	import SendSummary from './SendSummary.svelte';
 	import type BigNumber from 'bignumber.js';
 	import Flasher from './Flasher.svelte';
+	import { TACOSENDER_CONTRACT_ADDRESS } from '$lib/Network';
 
     let token: Token | undefined;
     let balance: bigint;
@@ -120,7 +120,7 @@
 
         const roseBalance = await $provider!.getBalance($signerAddress);
         const balance = await contract.balanceOf($signerAddress);
-        const allowance = await contract.allowance($signerAddress, ca.MultiSend);
+        const allowance = await contract.allowance($signerAddress, TACOSENDER_CONTRACT_ADDRESS);
         
         return { balance, allowance, roseBalance }
     }
@@ -132,7 +132,7 @@
                  $unwrappedSigner!
             );
             
-        const tx = await contract.approve(ca.MultiSend, total, { value: 0 });
+        const tx = await contract.approve(TACOSENDER_CONTRACT_ADDRESS, total, { value: 0 });
         await tx.wait();
     }
 
@@ -146,10 +146,10 @@
 
 <div>
     <form>
-        <TokenSelector bind:token bind:valid={tokenValid} bind:error={tokenError} disabled={!$connectedToSapphire} /> 
-        <DestinationsTextArea bind:addresses bind:amounts bind:valid={destinationsValid} bind:error={parseError} disabled={!$connectedToSapphire}/>
+        <TokenSelector bind:token bind:valid={tokenValid} bind:error={tokenError} disabled={!$connected} /> 
+        <DestinationsTextArea bind:addresses bind:amounts bind:valid={destinationsValid} bind:error={parseError} disabled={!$connected}/>
 
-        {#if !$connectedToSapphire}
+        {#if !$connected}
             <WalletConnection fullWidth={true} />
         {:else if $form !== 'entering' && $form !== 'invalid' && token}
             <SendSummary symbol={token.symbol} unit={token.decimals} {addresses} {total} success={$form === 'complete'}>

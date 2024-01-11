@@ -1,13 +1,13 @@
 <script lang="ts">
+	import { TACOSENDER_CONTRACT_ADDRESS } from "$lib/Network";
 	import { unwrappedMultiSend, provider, signerAddress } from "$lib/Stores";
 	import { ethers } from "ethers";
-    import contractAddress from "$lib/contracts/contract-addresses.json";
 
     let owner: string;
     let balance: bigint;
 
     $: $unwrappedMultiSend?.owner().then(o => owner = o);
-    $: $provider?.getBalance(contractAddress.MultiSend).then(b => balance = b);
+    $: $provider?.getBalance(TACOSENDER_CONTRACT_ADDRESS).then(b => balance = b);
     $: isOwner = owner && $signerAddress && owner.toLowerCase() === $signerAddress.toLowerCase();
 
     let withdrawing: boolean;
@@ -20,7 +20,7 @@
                 return receipt.wait()
                 .then(() => {
                     $provider
-                       ?.getBalance(contractAddress.MultiSend)
+                       ?.getBalance(TACOSENDER_CONTRACT_ADDRESS)
                         .then(b => balance = b);
                 })
             })

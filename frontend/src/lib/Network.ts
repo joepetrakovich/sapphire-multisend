@@ -1,11 +1,13 @@
-import { type Network, OasisNetworkStatus } from "./Models";
+import { type Network, NetworkStatus } from "./Models";
 import { ethers } from "ethers";
+import ca from "$lib/contracts/contract-addresses.json";
 
+const { MODE } = import.meta.env
 const SWITCH_CHAIN_ERROR_CHAIN_NOT_ADDED: number = 4902;
 const UNRECOGNIZED_CHAIN_ERROR: number = -32603;
 
 export const OASIS_SAPPHIRE_TESTNET: Network = {
-    name: "Oasis Sapphire Testnet",
+    name: "Sapphire Testnet",
     chainIdHex:  "0x5aff",
     chainIdDecimal: 23295,
     rpcUrls: ["https://testnet.sapphire.oasis.dev"],
@@ -15,12 +17,25 @@ export const OASIS_SAPPHIRE_TESTNET: Network = {
         symbol: "TEST",
         decimals: 18
     }
-  }
+}
 
-  export const HARDHAT_NETWORK: Network = {
+export const OASIS_SAPPHIRE_MAINNET: Network = {
+    name: "Sapphire",
+    chainIdHex:  "0x5afe",
+    chainIdDecimal: 23294,
+    rpcUrls: ["https://sapphire.oasis.io"],
+    blockExplorerUrls: ["https://explorer.sapphire.oasis.io"],
+    nativeCurrency: {
+        name: "ROSE", 
+        symbol: "ROSE",
+        decimals: 18
+    }
+}
+
+export const HARDHAT_NETWORK: Network = {
     name: "Hardhat",
     chainIdHex:  "0x539",
-    chainIdDecimal: 31337,
+    chainIdDecimal: 1337,
     rpcUrls: ["http://127.0.0.1:8545/"],
     blockExplorerUrls: ["https://localhost"],
     nativeCurrency: {
@@ -28,7 +43,10 @@ export const OASIS_SAPPHIRE_TESTNET: Network = {
         symbol: "ETH",
         decimals: 18
     }
-  }
+}
+
+export const DESIRED_NETWORK: Network = MODE === 'testnet' ? OASIS_SAPPHIRE_TESTNET : MODE === 'mainnet' ? OASIS_SAPPHIRE_MAINNET : HARDHAT_NETWORK;
+export const TACOSENDER_CONTRACT_ADDRESS: string = MODE === 'testnet' ? ca.MultiSendTestnet : MODE === 'mainnet' ? ca.MultiSendMainnet : ca.MultiSendHardhat;
 
   function addNetwork(network: Network) {
     return window.ethereum.request({
@@ -75,28 +93,28 @@ export const OASIS_SAPPHIRE_TESTNET: Network = {
     });
 }
 
-export async function getOasisNetworkConnectionStatus(): Promise<OasisNetworkStatus> {
+export async function getNetworkConnectionStatus(chainId: number): Promise<NetworkStatus> {
     try {    
         if (!window.ethereum) {
-            return OasisNetworkStatus.PROVIDER_NOT_FOUND;
+            return NetworkStatus.PROVIDER_NOT_FOUND;
         }
  
         const accounts = await window.ethereum.request({ method: 'eth_accounts' });
         if (!accounts?.length) {
-            return OasisNetworkStatus.WALLET_NOT_CONNECTED;
+            return NetworkStatus.WALLET_NOT_CONNECTED;
         }
 
         const provider = new ethers.BrowserProvider(window.ethereum);
         const network = await provider.getNetwork();
 
-        if (network.chainId.toString() === OASIS_SAPPHIRE_TESTNET.chainIdDecimal.toString()) {
-            return OasisNetworkStatus.ON_SAPPHIRE_PARATIME;
+        if (network.chainId.toString() === chainId.toString()) {
+            return NetworkStatus.ON_DESIRED_NETWORK;
         }
         
-        return OasisNetworkStatus.ON_DIFFERENT_NETWORK;
+        return NetworkStatus.ON_DIFFERENT_NETWORK;
 
     } catch (error) {
-        console.error(`An error occurred while trying to connect to the Oasis network: ${error}`);
-        return OasisNetworkStatus.PROVIDER_NOT_FOUND;
+        console.error(`An error occurred while trying to connect to the network: ${error}`);
+        return NetworkStatus.PROVIDER_NOT_FOUND;
     }
 }

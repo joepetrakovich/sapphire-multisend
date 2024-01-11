@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { fee, connectedToSapphire } from "$lib/Stores";
+	import { fee, connected } from "$lib/Stores";
 	import { ethers } from "ethers";
 </script>
 
 <span>
-    {#if $connectedToSapphire}
+    {#if $connected}
         Fee: {ethers.formatEther($fee)} Rose
     {/if}
 </span>
