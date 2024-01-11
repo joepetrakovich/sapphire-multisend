@@ -9,7 +9,7 @@ DONE - better names for consts CONTRACT_ADDRESS -> MULTISEND_CA..
 
 - verify contract on testnet 
 - verify contract on  mainnet
--- sourcify not working? and mainnet explorer down.. is it jp vpn? is it because of openzep?
+-- sourcify not working? and mainnet explorer down..  is it because of openzep?
 - dont allow tab to icons, or just hide focus style.
 
 - test deploys, branch deploys, urls.
