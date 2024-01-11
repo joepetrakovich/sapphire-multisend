@@ -1,14 +1,19 @@
 
 ## TODAY
 ----------------
-DONE - pre-send summary view with (need that 9B util too?)
-DONE - success view
-DONE - fix tab off. should prob focus into send/approve button.
-DONE - add pulse somewhere during sending/approving
-DONE - fix change account loses total, should it just clear? providers and stuff should reset
-DONE (but could handle reject erorrs better) - error view
-DONE - hide state internals 
-- push
+DONE - add copyright text
+DONE - change fee to 5 rose
+DONE - deploy testtoken on mainnet to test with
+       0xEB5cf036D645656e6E7b207646Cf601C4ed6A280 MTK
+DONE - better names for consts CONTRACT_ADDRESS -> MULTISEND_CA..
+
+- verify contract on testnet 
+- verify contract on  mainnet
+-- sourcify not working? and mainnet explorer down.. is it jp vpn? is it because of openzep?
+- dont allow tab to icons, or just hide focus style.
+
+- test deploys, branch deploys, urls.
+
 
 ## NEXT
 ----------------
@@ -18,6 +23,11 @@ DONE - hide state internals
 - user rejected error better handling.
 - a better coloring for those radios.
 - error message when sending rose doesnt specify "to cover rose fee"
+
+- remember if you make contract changes you'll also need a CONST for the ABI.
+
+- try adding "an oasis sapphire multisender" or some subtitle
+could alternatively add it to the connected wallet view
 
 - future refactor it so that a signer change can trigger a reset recalc from top down, so values stay but balances and allowances recalc.
 - also could have textarea red if not enough balance errors

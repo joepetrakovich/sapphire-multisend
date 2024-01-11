@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { connectedToSapphire, signerAddress } from '$lib/Stores';
     import OasisLogo from '$lib/images/oasis-logo-120px.png';
 	import SendTokenForm from '$lib/components/SendTokenForm.svelte';
     import SendRoseForm from '$lib/components/SendRoseForm.svelte';
+    import { connected, signerAddress } from '$lib/Stores';
     
     enum SendType { ERC20Token, Rose }
     let group: SendType = SendType.ERC20Token;
@@ -11,8 +11,8 @@
 <div>
     <div>
         <span>Send:</span>
-        <input type="radio" value={SendType.ERC20Token} bind:group disabled={!$connectedToSapphire} id="token" /><label for="token">Tokens</label>
-        <input type="radio" value={SendType.Rose} bind:group disabled={!$connectedToSapphire} id="rose" /><label for="rose"><img src={OasisLogo} alt="Oasis Logo" width="16" />Rose</label>
+        <input type="radio" value={SendType.ERC20Token} bind:group disabled={!$connected} id="token" /><label for="token">Tokens</label>
+        <input type="radio" value={SendType.Rose} bind:group disabled={!$connected} id="rose" /><label for="rose"><img src={OasisLogo} alt="Oasis Logo" width="16" />Rose</label>
     </div>
 
     {#key $signerAddress}

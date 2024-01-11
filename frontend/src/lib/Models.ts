@@ -22,10 +22,10 @@ export interface Network {
     nativeCurrency: Currency
 }
 
-export enum OasisNetworkStatus { 
+export enum NetworkStatus { 
     INITIALIZING,
     WALLET_NOT_CONNECTED,
     PROVIDER_NOT_FOUND, 
     ON_DIFFERENT_NETWORK, 
-    ON_SAPPHIRE_PARATIME
+    ON_DESIRED_NETWORK
 };
