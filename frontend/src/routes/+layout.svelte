@@ -41,7 +41,7 @@
         <span>v{PKG.version}</span>
         <div>
             <span>&copy; 2024 Tacosender</span>
-            <span>. All rights reserved.</span>
+            <span>.&nbsp; All rights reserved.</span>
         </div>
     </div>
 </footer>
@@ -127,6 +127,10 @@
     @media (min-width: 460px) {
         footer div:nth-child(2) div span:nth-child(2) {
             display: inline-block;
+        }
+        footer div:nth-child(2) div {
+            display: flex;
+            gap: 0;
         }
     }
 </style>
