@@ -7,7 +7,7 @@ const SWITCH_CHAIN_ERROR_CHAIN_NOT_ADDED: number = 4902;
 const UNRECOGNIZED_CHAIN_ERROR: number = -32603;
 
 export const OASIS_SAPPHIRE_TESTNET: Network = {
-    name: "Sapphire Testnet",
+    name: "Sapphire (Test)",
     chainIdHex:  "0x5aff",
     chainIdDecimal: 23295,
     rpcUrls: ["https://testnet.sapphire.oasis.dev"],
