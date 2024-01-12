@@ -6,17 +6,16 @@ DONE - change fee to 5 rose
 DONE - deploy testtoken on mainnet to test with
        0xEB5cf036D645656e6E7b207646Cf601C4ed6A280 MTK
 DONE - better names for consts CONTRACT_ADDRESS -> MULTISEND_CA..
-
-- verify contract on testnet 
-- verify contract on  mainnet
--- sourcify not working? and mainnet explorer down.. is it jp vpn? is it because of openzep?
-- dont allow tab to icons, or just hide focus style.
-
-- test deploys, branch deploys, urls.
+DONE - test deploys, branch deploys, urls.
+DONE - verify contract on testnet 
+DONE - verify contract on  mainnet
+DONE - dont allow tab to icons, or just hide focus style.
 
 
 ## NEXT
 ----------------
+- add a version num display, handle responsive better for copyright and connect to sapphire testnet button, withdraw button
+
 - token/rose balance view (could be annoying with massive amounts, need that 9B util in rose derby? that only worked with ether tho.. look for library
 -- can be reminiscent of metamask's token amount display. is there an alg
 -- this is a pain because of ellipses, can just be truncated..
@@ -32,10 +31,6 @@ could alternatively add it to the connected wallet view
 - future refactor it so that a signer change can trigger a reset recalc from top down, so values stay but balances and allowances recalc.
 - also could have textarea red if not enough balance errors
 
-- verify testnet contract
--- a way to switch to testnet/mainnet via config on netlify
-42px logo? mobile / pc
-- mainnet after testing
   Currently using unwrapped providers because they don't seem to be
   doing anything either way and I don't have any view calls that use
   msg.sender. for now its testnet so nbd

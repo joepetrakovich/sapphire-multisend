@@ -1,6 +1,7 @@
 //import '@oasisprotocol/sapphire-hardhat';
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import "@nomicfoundation/hardhat-verify";
 
 require('dotenv').config();
 
@@ -23,6 +24,11 @@ const config: HardhatUserConfig = {
       accounts: process.env.MAINNET_PRIVATE_KEYS?.split(','),
       chainId: 0x5afe,
     }
+  },
+  sourcify: {
+    enabled: true,
+    apiUrl: "https://sourcify.dev/server",
+    browserUrl: "https://repo.sourcify.dev",
   },
   mocha: {
     timeout: 60000
