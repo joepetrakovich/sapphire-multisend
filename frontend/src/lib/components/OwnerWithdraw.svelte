@@ -30,8 +30,13 @@
     }
 </script>
 
-<span>
-    {#if isOwner} 
-        <button disabled={withdrawing} on:click={withdraw}>{withdrawing ? 'Withdrawing...' : `Withdraw ${balance && ethers.formatEther(balance)}`}</button>
-    {/if}
-</span>
+{#if isOwner} 
+    <button disabled={withdrawing} on:click={withdraw}>{withdrawing ? 'Withdrawing...' : `Withdraw ${balance && ethers.formatEther(balance)}`}</button>
+{/if}
+
+<style>
+    button {
+        text-wrap: nowrap;
+    }
+</style>
+
