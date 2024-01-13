@@ -39,10 +39,6 @@
     <div>
         <OwnerWithdraw />
         <span>v{PKG.version}</span>
-        <div>
-            <span>&copy; 2024 Tacosender</span>
-            <span>.&nbsp; All rights reserved.</span>
-        </div>
     </div>
 </footer>
 
@@ -113,24 +109,5 @@
     }
     footer img {
         vertical-align: sub;
-    }
-    footer :global(button),
-    footer div:nth-child(2) div span:nth-child(2) {
-        display: none;
-    }
-
-    @media (min-width: 300px) {
-        footer :global(button) {
-            display: block;
-        }
-    }
-    @media (min-width: 460px) {
-        footer div:nth-child(2) div span:nth-child(2) {
-            display: inline-block;
-        }
-        footer div:nth-child(2) div {
-            display: flex;
-            gap: 0;
-        }
     }
 </style>

@@ -39,7 +39,7 @@
                 try {
                     total = sumDecimalsAsBigInt(amounts, token!.decimals);
                 } catch (e) {
-                    this.error(e);
+                    form.error(e);
                     return;
                 }
 
@@ -48,24 +48,20 @@
                     balance = ba.balance;
                     allowance = ba.allowance;
                     if (ba.roseBalance < $fee) {
-                        this.error('Insufficient Rose balance to pay fee')
+                        form.error('Insufficient Rose balance to pay fee')
                     }
                     else if (balance < total) {
-                        this.error('Insufficient token balance')
+                        form.error('Insufficient token balance')
                     } else if (allowance < total) {
                         this.needsApproval();
                     } else {
                         this.success();
                     }
                     })
-                    .catch(this.error);       
+                    .catch(form.error);       
             },
             needsApproval() {return 'awaitingApproval'},
-            success() { return 'valid' },
-            error(e) {
-                error = e;
-                return 'invalid';
-            },
+            success() { return 'valid' }
         },
         awaitingApproval: {
             approve: 'approving'
@@ -74,13 +70,9 @@
             _enter() {
                 approve()
                   .then(this.success)
-                  .catch(this.error);
+                  .catch(form.error);
             },
-            success() { return 'validating' },
-            error(e) {
-                error = e;
-                return 'invalid';
-            }
+            success() { return 'validating' }
         },
         invalid: {},
         valid: {
@@ -90,18 +82,17 @@
             _enter() {
                 send()
                   .then(this.success)
-                  .catch(this.error);
+                  .catch(form.error);
             },
-            success() { return 'complete' },
-            error(e) {
-                error = e;
-                return 'invalid';
-            }
+            success() { return 'complete' }
         },
         complete: {},
         '*': {
             input: 'entering',
             error(e) {
+                if (e?.code === 'ACTION_REJECTED') {
+                    return 'entering';
+                }
                 error = e;
                 return 'invalid';
             }

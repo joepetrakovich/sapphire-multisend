@@ -32,7 +32,7 @@
                 try {
                     total = sumDecimalsAsBigInt(amounts, 18);
                 } catch (e) {
-                    this.error(e);
+                    form.error(e);
                     return;
                 }
                 
@@ -42,19 +42,15 @@
                         if (balance >= total + $fee) {
                             this.success();
                         } else if (balance >= total) {
-                            this.error('Insufficient Rose balance to pay fee');
+                            form.error('Insufficient Rose balance to pay fee');
                         } else {
-                            this.error('Insufficient Rose balance');
+                            form.error('Insufficient Rose balance');
                         }
                         })
-                    .catch(this.error);
+                    .catch(form.error);
                 
             },
-            success() { return 'valid' },
-            error(e) {
-                error = e;
-                return 'invalid';
-            },
+            success() { return 'valid' }
         },
         invalid: {},
         valid: {
@@ -64,18 +60,17 @@
             _enter() {
                 send()
                   .then(this.success)
-                  .catch(this.error);
+                  .catch(form.error);
             },
-            success() { return 'complete' },
-            error(e) {
-                error = e;
-                return 'invalid';
-            }
+            success() { return 'complete' }
         },
         complete: {},
         '*': {
             input: 'entering',
             error(e) {
+                if (e?.code === 'ACTION_REJECTED') {
+                    return 'entering';
+                }
                 error = e;
                 return 'invalid';
             }
