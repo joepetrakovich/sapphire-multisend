@@ -16,7 +16,12 @@
     {/if}
     <span>
         {success ? "Sent" : "Sending"} {ethers.formatUnits(total, unit)} 
-        {symbol} to {addresses.length} address{#if addresses.length > 1}es{/if}
+        {symbol} 
+        {#if addresses.length > 1}
+        across {addresses.length} addresses
+        {:else}
+        to 1 address
+        {/if}
     </span>
     <slot />
 </div>

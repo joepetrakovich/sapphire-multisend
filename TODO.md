@@ -5,9 +5,9 @@ DONE - user rejected error better handling.
 DONE - remove copyright, its a dapp.
 DONE - attempt refactor it so that a signer change can trigger a reset recalc from top down, so values stay but balances and allowances recalc.
 DONE - also could have textarea red if not enough balance errors
-- token/rose balance view (could be annoying with massive amounts, need that 9B util in rose derby? that only worked with ether tho.. look for library
--- can be reminiscent of metamask's token amount display. is there an alg
 
+- token/rose balance view (could be annoying with massive amounts, need that 9B util in rose derby? that only worked with ether tho.. look for library
+  can be reminiscent of metamask's token amount display. is there an alg
 
 
 ## NEXT
