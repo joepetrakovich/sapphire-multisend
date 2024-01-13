@@ -52,9 +52,15 @@
             },
             success() { return 'valid' }
         },
-        invalid: {},
+        invalid: {
+            validate() {
+                error = undefined;
+                return 'validating';
+            }
+        },
         valid: {
-            send: 'sending'
+            send: 'sending',
+            validate: 'validating'
         },
         sending: {
             _enter() {
@@ -69,7 +75,7 @@
             input: 'entering',
             error(e) {
                 if (e?.code === 'ACTION_REJECTED') {
-                    return 'entering';
+                    return 'validating';
                 }
                 error = e;
                 return 'invalid';
@@ -77,7 +83,7 @@
         }
     });
 
-    $: destinationsValid ? form.validate() : form.input();
+    $: $signerAddress && destinationsValid ? form.validate() : form.input();
     $: parseError ? form.error(parseError) : form.input();
 
     const getRoseBalance = async () => $provider!.getBalance($signerAddress);
@@ -92,7 +98,7 @@
 
 <div>
     <form>        
-        <DestinationsTextArea bind:addresses bind:amounts bind:valid={destinationsValid} bind:error={parseError} disabled={!$connected}/>
+        <DestinationsTextArea bind:addresses bind:amounts bind:valid={destinationsValid} bind:error={parseError} bind:externalError={error} disabled={!$connected}/>
         
         {#if !$connected}
             <WalletConnection fullWidth={true} />

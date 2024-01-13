@@ -9,6 +9,7 @@
     export let amounts: BigNumber[];
     export let valid: boolean;
     export let error: string | undefined;
+    export let externalError: string | undefined;
 
     let text: string;
     let lineNum = 0;
@@ -94,10 +95,9 @@
     const parse = () => Papa.parse(text, { delimiter: ',', step, complete });
 </script>
 
-<textarea rows="10" class={$state} 
+<textarea rows="10" class={externalError ? 'invalid' : $state}
           bind:value={text} on:blur={state.parse} on:input={state.input} 
-          {disabled} 
-          placeholder="Enter an address and amount (0x00,1) on each line..." 
+          {disabled} placeholder="Enter an address and amount (0x00,1) on each line..." 
         />
 
 <style>
