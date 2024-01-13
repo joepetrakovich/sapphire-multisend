@@ -30,15 +30,14 @@
             {#if MODE === 'testnet' || MODE === 'hardhat'}
                 <img src={ConeIcon} alt="Cone Icon" title="{MODE}">
             {/if}
-
-            {#if MODE === 'testnet'}
-                <a href="https://faucet.testnet.oasis.dev/" target="_blank">Testnet Faucet</a>
-            {/if}
+            <span>v{PKG.version}</span>
         </div>
     </div>
     <div>
         <OwnerWithdraw />
-        <span>v{PKG.version}</span>
+        {#if MODE === 'testnet'}
+            <a href="https://faucet.testnet.oasis.dev/" target="_blank">Testnet Faucet</a>
+        {/if}
     </div>
 </footer>
 
