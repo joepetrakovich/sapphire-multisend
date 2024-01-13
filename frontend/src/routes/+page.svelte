@@ -2,7 +2,7 @@
     import OasisLogo from '$lib/images/oasis-logo-120px.png';
 	import SendTokenForm from '$lib/components/SendTokenForm.svelte';
     import SendRoseForm from '$lib/components/SendRoseForm.svelte';
-    import { connected, signerAddress } from '$lib/Stores';
+    import { connected } from '$lib/Stores';
     
     enum SendType { ERC20Token, Rose }
     let group: SendType = SendType.ERC20Token;
@@ -15,7 +15,7 @@
         <input type="radio" value={SendType.Rose} bind:group disabled={!$connected} id="rose" /><label for="rose"><img src={OasisLogo} alt="Oasis Logo" width="16" />Rose</label>
     </div>
 
-    {#key $signerAddress}
+    {#key $connected}
         {#if group === SendType.Rose}
             <SendRoseForm />
         {:else}
