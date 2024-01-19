@@ -1,17 +1,29 @@
 
 ## TODAY
 ----------------
-DONE - user rejected error better handling.
-DONE - remove copyright, its a dapp.
-DONE - attempt refactor it so that a signer change can trigger a reset recalc from top down, so values stay but balances and allowances recalc.
-DONE - also could have textarea red if not enough balance errors
+- allow sending tokens to more than 180 addresses
+DONE -- fix uint8 overflow
+DONE -- set gas limit
+-- seems I can send 1280 on testnet
+-- 500 on mainnet.
+-- gaslimit over 15m gets coalesce error
+-- reverify on test and main
+
+## NEXT
+----------------
+- sending over 180 addresses runs out of gas. 
+-- first fixing uint8 overflow
+-- then setting gas to 15_000_000 seem to be max at least on testnet but allows sending 1023 addresses tokens. prob more rose. 
+
+Error: could not coalesce error (error={ "code": -32603, "message": "Internal JSON-RPC error." }, payload={ "id": 147, "jsonrpc": "2.0", "method": "eth_sendTransaction", "params": [ { "data": "0x8e89971...(truncated)", "from": "0xbb50dc2148e46dd852cc611935d2996a45c5684c", "gas": "0x1036640", "to": "0x2ca099ae8f22984104ff6e910f2809b7730eb9e8", "value": "0x1bc16d674ec80000" } ] }, code=UNKNOWN_ERROR, version=6.9.0)
+
+-- is it the global per block limit or just gas estimation?
+-- can I use gas estimation via the sapphire wrapper and see what is suggests?
+-- is it how the array is getting created?
 
 - token/rose balance view (could be annoying with massive amounts, need that 9B util in rose derby? that only worked with ether tho.. look for library
   can be reminiscent of metamask's token amount display. is there an alg
 
-
-## NEXT
-----------------
 
 ## NOTES
 ---------------

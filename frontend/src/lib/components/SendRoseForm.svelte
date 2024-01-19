@@ -91,7 +91,7 @@
     const send = async () => {
         const amountsBigInt = amounts.map(amount => ethers.parseEther(amount.toFixed()));
         const fee = await $unwrappedMultiSend!.fee();
-        const receipt = await $unwrappedMultiSend!.multiSendRose(addresses, amountsBigInt, { value: total + fee });
+        const receipt = await $unwrappedMultiSend!.multiSendRose(addresses, amountsBigInt, { value: total + fee, gasLimit: 15_000_000 });
         await receipt.wait();
     }
 </script>
