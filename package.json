@@ -1,6 +1,6 @@
 {
   "name": "tacosender",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,6 +16,7 @@
     "hardhat": "^2.19.2"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.1"
+    "@openzeppelin/contracts": "^5.0.1",
+    "papaparse": "^5.4.1"
   }
 }
